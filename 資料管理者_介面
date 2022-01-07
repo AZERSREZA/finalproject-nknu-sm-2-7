@@ -1,0 +1,52 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+
+public class teacher_gui implements ActionListener {
+ private static JButton add = new JButton("建立及管理各科題庫");
+ private static JButton search = new JButton("查詢相關試題內容");
+ private static JButton correct = new JButton("查詢及修改成績");
+ private static JButton back = new JButton("登出");
+ private static JFrame userframe = new JFrame("題庫管理員介面 ");
+
+ teacher_gui() {
+  userframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  userframe.setSize(400, 400);
+  userframe.setLayout(null);
+  userframe.setVisible(true);
+
+  add.setBounds(107, 50, 165, 30);
+  search.setBounds(115, 105, 150, 30);
+  correct.setBounds(115, 165, 150, 30);
+  back.setBounds(165, 250, 70, 30);
+
+  userframe.add(add);
+  userframe.add(search);
+  userframe.add(correct);
+  userframe.add(back);
+
+  back.addActionListener(this);
+  add.addActionListener(this);
+  search.addActionListener(this);
+  correct.addActionListener(this);
+
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  if (e.getSource() == back) {// 登出按鈕
+   userframe.dispose();
+   charactergui cg = new charactergui();
+  } else if (e.getSource() == search) {// 查詢試題
+   userframe.dispose();
+   searchquestion sr = new searchquestion();
+  } else if (e.getSource() == add) {// 建立、管理題庫
+   userframe.dispose();
+   add_deleteQuestion sr = new add_deleteQuestion();
+  } else if (e.getSource() == correct) {// 修改成績
+   teacher_searchScore ts = new teacher_searchScore();
+  }
+ }
+}
