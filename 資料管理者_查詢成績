@@ -1,0 +1,207 @@
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+public class teacher_searchScore implements ActionListener {
+ // 確認帳號存在功能
+ public String check(String userid) {
+  Connection c = null;
+  Statement stmt = null;
+  String answer = "false";
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql;
+   sql = "SELECT  studentid FROM studentaccount";
+   ResultSet rs = stmt.executeQuery(sql);
+
+   // 展开结果集数据库
+   while (rs.next()) {
+    String studentid = rs.getString("studentid");
+    // 输出数据
+    if (studentid.equals(userid)) {
+     answer = "true";
+     break;
+    }
+   }
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return answer;
+ }
+
+ // 顯示成績功能
+ public String show(String subject, String studentid) {
+  Connection c = null;
+  Statement stmt = null;
+  String score = "";
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql = "";
+   sql = "SELECT chinese, english,math FROM testscore WHERE studentid='" + studentid + "'";
+   ResultSet rs = stmt.executeQuery(sql);
+   while (rs.next()) {
+    if (subject.equals("國文")) {
+     score = rs.getString("chinese");
+
+    } else if (subject.equals("英文")) {
+     score = rs.getString("english");
+     System.out.println("+" + score + "+");
+    } else if (subject.equals("數學")) {
+     score = rs.getString("math");
+    }
+   }
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return score;
+ }
+
+ private JLabel searchid = new JLabel("搜尋帳號 :");
+ private JLabel pro = new JLabel("科目");
+ private JLabel grade = new JLabel("成績：");
+ private JButton search = new JButton("搜尋");
+ private JButton reback = new JButton("返回");
+ private JButton show = new JButton("查看成績");
+ private JButton revise = new JButton("修改成績");
+ public static JTextField searchtext = new JTextField(20);
+ public static JLabel gradetext = new JLabel("");
+ String[] proString = { "國文", "英文", "數學" };
+ JComboBox pros = new JComboBox(proString);
+ private static JFrame framex = new JFrame("查詢及修改成績");
+ private static JFrame bumpframex = new JFrame("");
+
+ teacher_searchScore() {
+
+  Color color1 = new Color(200, 200, 0);
+  Color color2 = new Color(0, 200, 100);
+
+  framex.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  framex.setSize(400, 300);
+  framex.setLayout(null);
+  framex.setVisible(true);
+
+  searchid.setBounds(60, 30, 80, 25);
+  searchtext.setBounds(140, 30, 100, 25);
+  search.setBounds(270, 30, 60, 25);
+
+  pro.setBounds(70, 100, 60, 25);
+  pros.setBounds(130, 100, 80, 25);
+
+  grade.setBounds(70, 150, 60, 25);
+  gradetext.setBounds(160, 150, 60, 25);
+
+  reback.setBounds(250, 210, 60, 25);
+  revise.setBounds(40, 210, 100, 25);
+  show.setBounds(140, 210, 100, 25);
+
+  framex.add(searchid);
+  framex.add(searchtext);
+  framex.add(search);
+  framex.add(pro);
+  framex.add(pros);
+
+  framex.add(grade);
+  framex.add(gradetext);
+  framex.add(revise);
+  framex.add(reback);
+  framex.add(show);
+
+  search.addActionListener(this);
+  revise.addActionListener(this);
+  reback.addActionListener(this);
+  show.addActionListener(this);
+
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  String searchx = searchtext.getText();
+  Object getsubject = pros.getItemAt(pros.getSelectedIndex());
+  String getsubject1 = getsubject.toString();
+  int a = 0;
+  String type = check(searchx);// 搜尋功能
+  if (e.getSource() == search && type.equals("true")) {// 搜尋成功
+   JOptionPane.showMessageDialog(bumpframex, "搜尋成功");
+
+  } else if (e.getSource() == search && type.equals("false")) {// 搜尋失敗
+   JOptionPane.showMessageDialog(bumpframex, "沒有此帳號");
+  }
+  if (e.getSource() == reback) {// 返回功能
+   framex.dispose();
+   teacher_gui tg = new teacher_gui();// 回到資料使用者介面
+  }
+  if (e.getSource() == show) {// 查看成績
+   String score = show(getsubject1, searchx);
+   System.out.println("=" + score + "=");
+   if (score == null) {// 若該科資料庫沒有值時
+    gradetext.setText("  ");
+    JOptionPane.showMessageDialog(bumpframex, "他還沒考這科喔！");
+   } else {
+    gradetext.setText(score);
+   }
+  }
+  if (e.getSource() == revise) {// 修改成績
+   framex.dispose();
+   teacher_reviseScore tr = new teacher_reviseScore();// 跳到修改成績視窗
+  }
+ }
+
+}
