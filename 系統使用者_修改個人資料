@@ -1,0 +1,255 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+public class revise_studentAccount implements ActionListener {
+ // 查看個人資料
+ public String[] show() {
+  Connection c = null;
+  Statement stmt = null;
+  String[] arr = new String[7];
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql;
+   sql = "SELECT name,password,major,grade,gender,gmail FROM studentaccount" + " where studentid='"
+     + student_login.id + "'";
+   ResultSet rs = stmt.executeQuery(sql);
+   while (rs.next()) {
+    String major = rs.getString("major");
+    String password = rs.getString("password");
+    String grade = rs.getString("grade");
+    String gender = rs.getString("gender");
+    String email = rs.getString("gmail");
+    String name = rs.getString("name");
+    arr[0] = name;
+    arr[1] = password;
+    arr[2] = major;
+    arr[3] = grade;
+    arr[4] = gender;
+    arr[5] = email;
+   }
+
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return arr;
+ }
+
+ // 依據所選更改資料
+ public void revise(int check, String value) {
+  Connection c = null;
+  Statement stmt = null;
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql = "";
+   if (check == 2) {
+    sql = "UPDATE studentaccount SET name='" + value + "'" + " WHERE studentid='" + student_login.id + "'";
+   } else if (check == 3) {
+    sql = "UPDATE studentaccount SET password='" + value + "'" + " WHERE studentid='" + student_login.id
+      + "'";
+   } else if (check == 4) {
+    sql = "UPDATE studentaccount SET major='" + value + "'" + " WHERE studentid='" + student_login.id + "'";
+   } else if (check == 5) {
+    sql = "UPDATE studentaccount SET grade='" + value + "'" + " WHERE studentid='" + student_login.id + "'";
+   } else if (check == 6) {
+    sql = "UPDATE studentaccount SET gender='" + value + "'" + " WHERE studentid='" + student_login.id
+      + "'";
+   } else if (check == 7) {
+    sql = "UPDATE studentaccount SET gmail='" + value + "'" + " WHERE studentid='" + student_login.id + "'";
+   } else if (check == 0) {
+    sql = "SELECT name,password,major,grade,gender,gmail FROM studentaccount" + " where studentid='"
+      + student_login.id + "'";
+   }
+   ResultSet rs = stmt.executeQuery(sql);
+
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+ }
+
+ private static JFrame cframe = new JFrame("修改個人資料");
+ private JLabel user = new JLabel("您的帳號為:  ");
+ private JLabel account = new JLabel(student_login.id);
+
+ private JLabel nick = new JLabel("暱稱：");
+ private JLabel pass = new JLabel("密碼：");
+ private JLabel gender = new JLabel("性別：");
+ private JLabel email = new JLabel("電郵：");
+ private static JFrame bumpframe1 = new JFrame("");
+
+ public JTextField nickf = new JTextField();
+ public JTextField passf = new JTextField();
+ public JTextField genderf = new JTextField();
+ public JTextField emailf = new JTextField();
+
+ private JLabel nickt = new JLabel();
+ private JLabel passt = new JLabel();
+ private JLabel gendert = new JLabel();
+ private JLabel emailt = new JLabel();
+
+ private JButton nickc = new JButton("修改");
+ private JButton passc = new JButton("修改");
+ private JButton genderc = new JButton("修改");
+ private JButton emailc = new JButton("修改");
+ private JButton ensure = new JButton("完成");
+ private JButton see = new JButton("查看");
+ protected static int check = 0;
+
+ revise_studentAccount() {
+  cframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  cframe.setSize(450, 400);
+  cframe.setLayout(null);
+  cframe.setVisible(true);
+
+  ensure.setBounds(160, 320, 60, 25);
+  see.setBounds(225, 320, 60, 25);
+  account.setBounds(205, 230, 150, 25);
+
+  nick.setBounds(75, 30, 60, 25);
+  pass.setBounds(75, 80, 60, 25);
+  gender.setBounds(75, 130, 60, 25);
+  email.setBounds(75, 180, 60, 25);
+  user.setBounds(100, 230, 200, 25);
+
+  nickf.setBounds(215, 30, 100, 25);
+  passf.setBounds(215, 80, 100, 25);
+  genderf.setBounds(215, 130, 100, 25);
+  emailf.setBounds(215, 180, 100, 25);
+
+  nickt.setBounds(125, 30, 80, 25);
+  passt.setBounds(125, 75, 80, 25);
+  gendert.setBounds(125, 130, 80, 25);
+  emailt.setBounds(125, 180, 80, 25);
+
+  nickc.setBounds(330, 30, 60, 25);
+  passc.setBounds(330, 80, 60, 25);
+  genderc.setBounds(330, 130, 60, 25);
+  emailc.setBounds(330, 180, 60, 25);
+
+  cframe.add(ensure);
+  cframe.add(user);
+  cframe.add(account);
+  cframe.add(nick);
+  cframe.add(pass);
+  cframe.add(gender);
+
+  cframe.add(email);
+  cframe.add(see);
+
+  cframe.add(nickf);
+  cframe.add(passf);
+  cframe.add(genderf);
+  cframe.add(emailf);
+
+  cframe.add(nickc);
+  cframe.add(passc);
+  cframe.add(genderc);
+  cframe.add(emailc);
+
+  cframe.add(nickt);
+  cframe.add(passt);
+  cframe.add(gendert);
+  cframe.add(emailt);
+
+  ensure.addActionListener(this);
+  nickc.addActionListener(this);
+  passc.addActionListener(this);
+  genderc.addActionListener(this);
+  emailc.addActionListener(this);
+  see.addActionListener(this);
+
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  if (e.getSource() == nickc) {// 更改姓名
+   String username = nickf.getText();
+   System.out.println(username);
+   check = 2;
+   revise(check, username);
+   JOptionPane.showMessageDialog(bumpframe1, "修改成功");
+  } else if (e.getSource() == passc) {// 更改密碼
+   String userpassword = passf.getText();
+   check = 3;
+   revise(check, userpassword);
+   JOptionPane.showMessageDialog(bumpframe1, "修改成功");
+  } else if (e.getSource() == genderc) {// 更改性別
+   String usergender = genderf.getText();
+   check = 6;
+   revise(check, usergender);
+   JOptionPane.showMessageDialog(bumpframe1, "修改成功");
+  } else if (e.getSource() == emailc) {// 更改email
+   String useremail = emailf.getText();
+   check = 7;
+   revise(check, useremail);
+   JOptionPane.showMessageDialog(bumpframe1, "修改成功");
+  } else if (e.getSource() == see) {// 查看全部資料
+   String[] arr = new String[7];
+   arr = show();
+   nickt.setText(arr[0]);
+   passt.setText(arr[1]);
+   gendert.setText(arr[4]);
+   emailt.setText(arr[5]);
+  } else if (e.getSource() == ensure) {// 返回系統使用者畫面
+   cframe.dispose();
+   student_gui sg = new student_gui();
+  }
+
+ }
+}
