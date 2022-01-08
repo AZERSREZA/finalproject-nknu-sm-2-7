@@ -1,0 +1,149 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.*;
+
+public class add_question implements ActionListener {
+ // 新增題目
+ public void add(String degree, String question, String a, String b, String c, String d, String answer) {
+  Connection conn = null;
+  Statement stmt = null;
+  try {
+   Class.forName("org.postgresql.Driver");
+   conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = conn.createStatement();
+   String sql = "";
+   if (add_deleteQuestion.y == 1) {// 國文科
+    sql = "INSERT INTO chinese VALUES('" + degree + "', '" + question + "', '" + a + "','" + b + "', '" + c
+      + "',  '" + d + "' ,'" + answer + "' ) ";
+   } else if (add_deleteQuestion.y == 2) {// 數學科
+    sql = "INSERT INTO math VALUES('" + degree + "', '" + question + "', '" + a + "','" + b + "', '" + c
+      + "',  '" + d + "' ,'" + answer + "' ) ";
+   } else if (add_deleteQuestion.y == 3) {// 英文科
+    sql = "INSERT INTO english VALUES('" + degree + "', '" + question + "', '" + a + "','" + b + "', '" + c
+      + "',  '" + d + "' ,'" + answer + "' ) ";
+   }
+   ResultSet rs = stmt.executeQuery(sql);
+
+   rs.close();
+   stmt.close();
+   conn.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (conn != null)
+     conn.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+ }
+
+ private static JFrame addframe = new JFrame("新增題目");
+ private JLabel title = new JLabel("   新增題目      ");
+ private static JFrame bumpframe = new JFrame("");
+ private JLabel degree = new JLabel("難 度");
+ private JLabel ques = new JLabel("問 題");
+ private JLabel seca = new JLabel("A");
+ private JLabel secb = new JLabel("B");
+ private JLabel secc = new JLabel("C");
+ private JLabel secd = new JLabel("D");
+ private JLabel ans = new JLabel("答 案");
+ private JTextField ansf = new JTextField("");
+ private JTextField quesf = new JTextField("");
+ private JTextField secaf = new JTextField("");
+ private JTextField secbf = new JTextField("");
+ private JTextField seccf = new JTextField("");
+ private JTextField secdf = new JTextField("");
+ private JTextField degf = new JTextField("");
+ private JButton ensure = new JButton("確認");
+
+ add_question() {
+  addframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  addframe.setSize(450, 450);
+  addframe.setLayout(null);
+  addframe.setVisible(true);
+
+  title.setBounds(190, 20, 100, 25);
+  ensure.setBounds(190, 330, 60, 25);
+  degree.setBounds(95, 60, 60, 30);
+  ques.setBounds(95, 100, 60, 25);
+  seca.setBounds(105, 140, 60, 25);
+  secb.setBounds(105, 180, 60, 25);
+  secc.setBounds(105, 220, 60, 25);
+  secd.setBounds(105, 260, 60, 30);
+  ans.setBounds(95, 300, 60, 30);
+  degf.setBounds(140, 60, 180, 25);
+  quesf.setBounds(140, 100, 180, 25);
+  secaf.setBounds(140, 140, 180, 25);
+  secbf.setBounds(140, 180, 180, 25);
+  seccf.setBounds(140, 220, 180, 25);
+  secdf.setBounds(140, 260, 180, 25);
+  ansf.setBounds(140, 300, 180, 25);
+
+  addframe.add(title);
+  addframe.add(degree);
+  addframe.add(ensure);
+  addframe.add(ques);
+  addframe.add(seca);
+  addframe.add(secb);
+  addframe.add(secc);
+  addframe.add(secd);
+  addframe.add(ans);
+  addframe.add(degf);
+  addframe.add(quesf);
+  addframe.add(secaf);
+  addframe.add(secbf);
+  addframe.add(seccf);
+  addframe.add(secdf);
+  addframe.add(ansf);
+
+  ensure.addActionListener(this);
+
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  String degreef = degf.getText();
+  String questionf = quesf.getText();
+  String af = secaf.getText();
+  String bf = secbf.getText();
+  String cf = seccf.getText();
+  String df = secdf.getText();
+  String answerf = ansf.getText();
+  if (e.getSource() == ensure && (questionf.equals("") | af.equals("") | bf.equals("") | cf.equals("")
+    | df.equals("") | answerf.equals(""))) {// 防止漏寫空格
+   JOptionPane.showMessageDialog(addframe, "有空格遺漏");
+  } else if (e.getSource() == ensure && (!questionf.equals("") | !af.equals("") | !bf.equals("") | !cf.equals("")
+    | !df.equals("") | !ansf.equals(""))) {
+   add(degreef, questionf, af, bf, cf, df, answerf);
+   JOptionPane.showMessageDialog(bumpframe, "新增成功");
+   addframe.dispose();
+   add_deleteQuestion sr = new add_deleteQuestion();
+  }
+
+ }
+}
