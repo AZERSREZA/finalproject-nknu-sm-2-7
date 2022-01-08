@@ -1,0 +1,303 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+public class exer extends JFrame implements ActionListener {
+ // 對答案
+ public int checkanswer(String amount, String subject, String getdegree, String[] arr) {
+  Connection conn = null;
+  Statement stmt = null;
+  int score = 0;
+  try {
+   Class.forName("org.postgresql.Driver");
+   conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = conn.createStatement();
+   String sql;
+   sql = " ";
+   // 依科目、難度區分
+   if (subject.equals("國文")) {
+    if (getdegree.equals("難")) {
+     sql = "SELECT  answer FROM chinese where degree='3'";
+    } else if (getdegree.equals("中")) {
+     sql = "SELECT  answer FROM chinese where degree='2'";
+    } else if (getdegree.equals("易")) {
+     sql = "SELECT  answer FROM chinese where degree='1'";
+    } else if (getdegree.equals("混合")) {
+     sql = "SELECT  answer FROM chinese";
+
+    } else if (subject.equals("數學")) {
+     if (getdegree.equals("難")) {
+      sql = "SELECT  answer FROM math where degree='3'";
+     } else if (getdegree.equals("中")) {
+      sql = "SELECT  answer FROM math where degree='2'";
+     } else if (getdegree.equals("易")) {
+      sql = "SELECT  answer FROM math where degree='1'";
+     } else if (getdegree.equals("混合")) {
+      sql = "SELECT  answer FROM math";
+     }
+    } else if (subject.equals("英文")) {
+     if (getdegree.equals("難")) {
+      sql = "SELECT  answer FROM english where degree='3'";
+     } else if (getdegree.equals("中")) {
+      sql = "SELECT  answer FROM english where degree='2'";
+     } else if (getdegree.equals("易")) {
+      sql = "SELECT  answer FROM english where degree='1'";
+     } else if (getdegree.equals("混合")) {
+      sql = "SELECT  answer FROM english";
+     }
+    }
+   }
+   int i = 0;
+   ResultSet rs = stmt.executeQuery(sql);
+   String[] arrsql = new String[20];
+   while (rs.next()) {
+    arrsql[i] = rs.getString("answer");
+    if (amount.equals("10題")) {
+     if (arrsql[i].equals(arr[i])) {
+      score += 10;
+     }
+    } else if (amount.equals("20題")) {
+     if (arrsql[i].equals(arr[i])) {
+      score += 5;
+     }
+    }
+   }
+
+   System.out.println(sql);
+   stmt.executeQuery(sql);
+
+   rs.close();
+   stmt.close();
+   conn.close();
+
+  } catch (
+
+  SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (conn != null)
+     conn.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return score;
+ }
+
+ // 查看題目
+ public ArrayList search(String getsubject, String getdegree) {
+  Connection conn = null;
+  Statement stmt = null;
+  ArrayList alist = new ArrayList();
+  alist.clear();
+  try {
+   Class.forName("org.postgresql.Driver");
+   conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = conn.createStatement();
+   String sql;
+   sql = " ";
+   if (getsubject.equals("國文")) {
+    sql = "SELECT degree, question,a,b,c,d,answer FROM chinese";
+   } else if (getsubject.equals("數學")) {
+    sql = " SELECT degree,question, a ,b ,c ,d,answer FROM math";
+   } else if (getsubject.equals("英文")) {
+    sql = "SELECT degree ,question ,a,b, c,d ,answer FROM english ";
+   }
+   ResultSet rs = stmt.executeQuery(sql);
+
+   while (rs.next()) {
+    String degree = rs.getString("degree");
+    String question = rs.getString("question");
+    String a = rs.getString("a");
+    String b = rs.getString("b");
+    String c = rs.getString("c");
+    String d = rs.getString("d");
+    String answer = rs.getString("answer");
+
+    if (getdegree.equals("混合")) {
+     alist.add(degree);
+     alist.add(question);
+     alist.add(a);
+     alist.add(b);
+     alist.add(c);
+     alist.add(d);
+    } else if (getdegree.equals("難")) {
+     if (degree.equals("3")) {
+      alist.add(degree);
+      alist.add(question);
+      alist.add(a);
+      alist.add(b);
+      alist.add(c);
+      alist.add(d);
+     }
+    } else if (getdegree.equals("中")) {
+     if (degree.equals("2")) {
+      alist.add(degree);
+      alist.add(question);
+      alist.add(a);
+      alist.add(b);
+      alist.add(c);
+      alist.add(d);
+     }
+    } else if (getdegree.equals("易")) {
+     if (degree.equals("1")) {
+      alist.add(degree);
+      alist.add(question);
+      alist.add(a);
+      alist.add(b);
+      alist.add(c);
+      alist.add(d);
+     }
+    }
+   }
+   rs.close();
+   stmt.close();
+   conn.close();
+
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (conn != null)
+     conn.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return alist;
+ }
+
+ private static JFrame userframe = new JFrame("暖身練習");
+ String subjectString[] = { "國文", "數學", "英文" };
+ JComboBox subject = new JComboBox(subjectString);
+ String degreeString[] = { "混合", "難", "中", "易" };
+ JComboBox degree = new JComboBox(degreeString);
+ String amountString[] = { "10題", "20題" };
+ JComboBox amount = new JComboBox(amountString);
+ String[] columns = new String[] { "難度", "問題", "A", "B", "C", "D" };
+ DefaultTableModel tableValue = new DefaultTableModel(columns, 0);
+ JTable table = new JTable(tableValue);
+ JScrollPane scrollable = new JScrollPane(table);
+ private static JButton back = new JButton("返回");
+ private static JButton ensure = new JButton("確認");
+ private static JButton printout = new JButton("送出");
+ JLabel showLabel = new JLabel();
+ JTextField useranswer = new JTextField(80);
+ JFrame bumpframe = new JFrame();
+
+ exer() {
+  userframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  userframe.setSize(1000, 800);
+  userframe.setLayout(null);
+  userframe.setVisible(true);
+  subject.setBounds(200, 20, 80, 25);
+  degree.setBounds(300, 20, 80, 25);
+  amount.setBounds(400, 20, 80, 25);
+  ensure.setBounds(500, 20, 80, 25);
+  showLabel.setBounds(200, 40, 250, 25);
+  scrollable.setBounds(10, 80, 900, 420);
+  back.setBounds(700, 20, 80, 25);
+  useranswer.setBounds(200, 555, 600, 25);
+  printout.setBounds(450, 600, 100, 25);
+
+  userframe.add(useranswer);
+  userframe.add(subject);
+  userframe.add(degree);
+  userframe.add(ensure);
+  userframe.add(showLabel);
+  userframe.add(scrollable);
+  userframe.add(back);
+  userframe.add(amount);
+  userframe.add(printout);
+
+  ensure.addActionListener(this);
+  back.addActionListener(this);
+  printout.addActionListener(this);
+
+ }
+
+ public void actionPerformed(ActionEvent e) {
+  Object getsubject = subject.getItemAt(subject.getSelectedIndex());
+  String getsubject1 = getsubject.toString();
+  String answer = useranswer.getText();
+  if (e.getSource() == ensure) {// 尋找題目進行練習
+   Object getsubject2 = subject.getItemAt(subject.getSelectedIndex());
+   String getsubject3 = getsubject.toString();
+   Object getdegree = degree.getItemAt(degree.getSelectedIndex());
+   String getdegree1 = getdegree.toString();
+   Object getamount = amount.getItemAt(amount.getSelectedIndex());
+   String getamount1 = getamount.toString();
+   String data = "科目：" + getsubject3 + "   難度：" + getdegree1 + "   數量：" + getamount1;
+   showLabel.setText(data);
+   ArrayList alist = new ArrayList();
+   tableValue.setRowCount(0);
+   alist = search(getsubject1, getdegree1);
+   int count = 0;
+   if (getamount1.equals("10題")) {// 選擇題數
+    for (int i = 0; i < 70; i += 7) {
+     Object[] obj = { alist.get(0 + count * 6), alist.get(1 + count * 6), alist.get(2 + count * 6),
+       alist.get(3 + count * 6), alist.get(4 + count * 6), alist.get(5 + count * 6) };
+     tableValue.addRow(obj);
+     count++;
+    }
+   } else if (getamount1.equals("20題")) {// 選擇題數
+    for (int i = 0; i < 140; i += 7) {
+     Object[] obj = { alist.get(0 + count * 6), alist.get(1 + count * 6), alist.get(2 + count * 6),
+       alist.get(3 + count * 6), alist.get(4 + count * 6), alist.get(5 + count * 6) };
+     tableValue.addRow(obj);
+     count++;
+    }
+   }
+  }
+
+  if (e.getSource() == back) {// 返回
+   userframe.dispose();
+   student_gui tg = new student_gui();
+  } else if (e.getSource() == printout) {// 完成作答算成績
+   Object getamount = amount.getItemAt(degree.getSelectedIndex());
+   String getamount1 = getamount.toString();
+   Object getdegree2 = degree.getItemAt(degree.getSelectedIndex());
+   String getdegree3 = getdegree2.toString();
+   JOptionPane.showMessageDialog(bumpframe, "確定送出嗎？");
+   String[] arr = new String[20];
+   arr = answer.split("");
+   int score = checkanswer(getamount1, getsubject1, getdegree3, arr);
+
+   JOptionPane.showMessageDialog(bumpframe, "恭喜完成練習，您的分數為:" + score);
+   userframe.dispose();
+   student_gui sg = new student_gui();
+  }
+ }
+}
