@@ -1,0 +1,190 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+public class forget_password implements ActionListener {
+ // 修改密碼
+ public void alterpass(String studentid, String password) {
+  Connection c = null;
+  Statement stmt = null;
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql;
+   sql = "UPDATE studentaccount SET password='" + password + "'" + " WHERE studentid='" + studentid + "'";
+   ResultSet rs = stmt.executeQuery(sql);
+
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+ }
+
+ // 確認帳號是否存在
+ public String check(String userid, String username, String useremail) {
+  Connection c = null;
+  Statement stmt = null;
+  String answer = "false";
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql;
+   sql = "SELECT  studentid, name, gmail FROM studentaccount";
+   ResultSet rs = stmt.executeQuery(sql);
+
+   // 展开结果集数据库
+   while (rs.next()) {
+    String studentid = rs.getString("studentid");
+    String studentname = rs.getString("name");
+    String studentemail = rs.getString("gmail");
+
+    if ((studentid.equals(userid) && studentname.equals(username) && studentemail.equals(useremail))) {
+     answer = "true";
+     break;
+    }
+
+   }
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return answer;
+ }
+
+ private static JFrame userframe = new JFrame("忘記密碼 ");
+ private static JLabel user = new JLabel("輸入你的帳號：");
+ private static JLabel nick = new JLabel("輸入你的暱稱：");
+ private static JLabel email = new JLabel("輸入你的電郵：");
+ private static JLabel pass = new JLabel("設定你的新密碼：");
+ private static JTextField usertext = new JTextField(20);
+ private static JTextField nicktext = new JTextField(20);
+ private static JTextField passText = new JTextField(20);
+ private static JTextField emailtext = new JTextField(20);
+ private static JButton ensure = new JButton("確認");
+ private static JButton backaway = new JButton("返回");
+ private static JButton search = new JButton("查詢");
+ private static JFrame bumpframe = new JFrame("忘記密碼 ");
+
+ forget_password() {
+  userframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  userframe.setSize(450, 450);
+  userframe.setLayout(null);
+  userframe.setVisible(true);
+  user.setBounds(65, 30, 120, 25);
+  email.setBounds(65, 60, 120, 25);
+  nick.setBounds(65, 90, 120, 25);
+  usertext.setBounds(200, 30, 180, 25);
+  emailtext.setBounds(200, 60, 180, 25);
+  nicktext.setBounds(200, 90, 180, 25);
+  pass.setBounds(65, 120, 180, 25);
+  passText.setBounds(200, 120, 180, 25);
+  search.setBounds(80, 200, 60, 25);
+  ensure.setBounds(160, 200, 60, 25);
+  backaway.setBounds(230, 200, 60, 25);
+
+  userframe.add(nick);
+  userframe.add(email);
+  userframe.add(user);
+  userframe.add(nicktext);
+  userframe.add(passText);
+  userframe.add(emailtext);
+  userframe.add(usertext);
+  userframe.add(ensure);
+  userframe.add(backaway);
+  userframe.add(search);
+  userframe.add(pass);
+
+  pass.setVisible(false);
+  passText.setVisible(false);
+  ensure.setVisible(false);
+
+  ensure.addActionListener(this);
+  backaway.addActionListener(this);
+  search.addActionListener(this);
+
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  String user = usertext.getText();
+  String email = emailtext.getText();
+  String nick = nicktext.getText();
+  String password = passText.getText();
+  if (e.getSource() == search && (user.equals("") | email.equals("") | nick.equals(""))) {// 每一行不得空白
+   JOptionPane.showMessageDialog(bumpframe, "請完整輸入每一空格");
+  } else if (e.getSource() == search) {
+   String type = check(user, nick, email);
+   if (type.equals("true")) {// 搜尋成功
+    JOptionPane.showMessageDialog(bumpframe, "此帳號存在");
+    pass.setVisible(true);
+    passText.setVisible(true);
+    ensure.setVisible(true);
+
+   } else {
+    JOptionPane.showMessageDialog(bumpframe, "帳號、電郵、暱稱輸入錯誤，請重新輸入帳號、電郵、暱稱");
+   }
+  } else if (e.getSource() == ensure) {// 修改密碼
+   alterpass(user, password);
+   JOptionPane.showMessageDialog(bumpframe, "密碼修改成功，新的密碼為：" + password);
+   userframe.dispose();
+   student_login sl = new student_login();
+  } else if (e.getSource() == backaway) {// 返回，回到資料使用者畫面
+   userframe.dispose();
+   student_login sl = new student_login();
+
+  }
+
+ }
+}
