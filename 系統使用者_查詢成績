@@ -1,0 +1,129 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+public class student_searchScore extends JFrame implements ActionListener {
+ public String[] search() {// 查詢成績
+  Connection conn = null;
+  Statement stmt = null;
+  String[] arr = new String[3];
+  try {
+   Class.forName("org.postgresql.Driver");
+   conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = conn.createStatement();
+   String sql;
+   sql = "SELECT chinese,math,english FROM testscore WHERE studentid='" + student_login.id + "'";
+   ResultSet rs = stmt.executeQuery(sql);
+
+   while (rs.next()) {
+    String chinese = rs.getString("chinese");
+    String math = rs.getString("math");
+    String english = rs.getString("english");
+    arr[0] = chinese;
+    arr[1] = english;
+    arr[2] = math;
+   }
+   rs.close();
+   stmt.close();
+   conn.close();
+
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (conn != null)
+     conn.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return arr;
+ }
+
+ private static JFrame userframe = new JFrame("歷次成績查詢");
+ private static JLabel subject = new JLabel("科目");
+ private static JLabel score = new JLabel("成績");
+ private static JLabel english = new JLabel("英文");
+ private static JLabel chinese = new JLabel("國文");
+ private static JLabel math = new JLabel("數學");
+ private static JLabel englishs = new JLabel();
+ private static JLabel chineses = new JLabel();
+ private static JLabel maths = new JLabel();
+ String[] columns = new String[] { "科目", "成績" };
+ DefaultTableModel tableValue = new DefaultTableModel(columns, 0);
+ JTable table = new JTable(tableValue);
+
+ private static JButton back = new JButton("返回");
+ private static JButton ensure = new JButton("查詢成績");
+
+ student_searchScore() {
+  userframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  userframe.setSize(375, 350);
+  userframe.setLayout(null);
+  userframe.setVisible(true);
+
+  subject.setBounds(100, 50, 80, 25);
+  score.setBounds(170, 50, 80, 25);
+  chinese.setBounds(100, 80, 80, 25);
+  english.setBounds(100, 110, 80, 25);
+  math.setBounds(100, 140, 80, 25);
+  chineses.setBounds(170, 80, 180, 25);
+  englishs.setBounds(170, 110, 180, 25);
+  maths.setBounds(170, 140, 180, 25);
+  ensure.setBounds(125, 200, 80, 25);
+  back.setBounds(125, 250, 80, 25);
+
+  userframe.add(ensure);
+  userframe.add(back);
+  userframe.add(subject);
+  userframe.add(score);
+  userframe.add(chinese);
+  userframe.add(english);
+  userframe.add(math);
+  userframe.add(chineses);
+  userframe.add(englishs);
+  userframe.add(maths);
+
+  ensure.addActionListener(this);
+  back.addActionListener(this);
+
+ }
+
+ public void actionPerformed(ActionEvent e) {
+  if (e.getSource() == ensure) {// 查詢成績，若裡面沒值表示還沒考該科
+   String[] arr = new String[3];
+   arr = search();
+   for (int i = 0; i < 3; i++) {
+    if (arr[i] == null) {
+     arr[i] = "你還沒考這科喔～";
+    }
+   }
+   chineses.setText(arr[0]);
+   englishs.setText(arr[1]);
+   maths.setText(arr[2]);
+  } else if (e.getSource() == back) {// 返回鍵
+   userframe.dispose();
+   student_gui sg = new student_gui();
+  }
+ }
+}
