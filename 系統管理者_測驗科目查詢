@@ -1,0 +1,165 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+public class groupManageSub implements ActionListener {
+ // 查看每個系有要考哪些科目
+ public String[] see(String sub) {
+  Connection conn = null;
+  Statement stmt = null;
+  String[] arr = new String[3];
+  try {
+   Class.forName("org.postgresql.Driver");
+   conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = conn.createStatement();
+   String sql;
+   sql = " ";
+   if (sub.equals("math")) {
+    sql = "SELECT english,math,chinese FROM altersubject WHERE subject='math'";
+   } else if (sub.equals("sem")) {
+    sql = "SELECT english,math,chinese FROM altersubject WHERE subject='sem'";
+   } else if (sub.equals("eng")) {
+    sql = "SELECT english,math,chinese FROM altersubject WHERE subject='eng'";
+   }
+   ResultSet rs = stmt.executeQuery(sql);
+
+   while (rs.next()) {
+    String eng = rs.getString("english");
+    String math = rs.getString("math");
+    String chin = rs.getString("chinese");
+    arr[0] = eng;
+    arr[1] = math;
+    arr[2] = chin;
+    System.out.println(arr);
+
+   }
+   rs.close();
+   stmt.close();
+   conn.close();
+
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (conn != null)
+     conn.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return arr;
+ }
+
+ private static JFrame framex = new JFrame("");
+ private static JFrame bumpframex = new JFrame("");
+ private JLabel sm = new JLabel("軟體系：");
+ private JLabel ma = new JLabel("數學系：");
+ private JLabel en = new JLabel("英文系：");
+ private JLabel semText = new JLabel();
+ private JLabel mathText = new JLabel();
+ private JLabel engText = new JLabel();
+
+ private JButton addx = new JButton("新增");
+ private JButton delx = new JButton("刪除");
+ private JButton see = new JButton("查看");
+ private JButton reback = new JButton("返回");
+
+ groupManageSub() {
+  framex.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  framex.setSize(400, 400);
+  framex.setLayout(null);
+  framex.setVisible(true);
+
+  sm.setBounds(70, 50, 60, 30);
+  ma.setBounds(70, 110, 60, 30);
+  en.setBounds(70, 170, 60, 30);
+  semText.setBounds(125, 50, 180, 30);
+  mathText.setBounds(125, 110, 180, 30);
+  engText.setBounds(125, 170, 180, 30);
+  addx.setBounds(150, 270, 60, 30);
+  delx.setBounds(210, 270, 60, 30);
+  see.setBounds(80, 270, 60, 30);
+  reback.setBounds(270, 270, 60, 30);
+
+  framex.add(sm);
+  framex.add(ma);
+  framex.add(en);
+  framex.add(semText);
+  framex.add(mathText);
+  framex.add(engText);
+  framex.add(addx);
+  framex.add(delx);
+  framex.add(see);
+  framex.add(reback);
+
+  addx.addActionListener(this);
+  delx.addActionListener(this);
+  see.addActionListener(this);
+  reback.addActionListener(this);
+
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  if (e.getSource() == addx) { // 新增科目
+   framex.dispose();
+   addGroupsub aG = new addGroupsub();
+  } else if (e.getSource() == delx) { // 刪除科目
+   framex.dispose();
+   delGroupsub dG = new delGroupsub();
+  } else if (e.getSource() == see) {// 查看每個系要考的科目
+   String[] arr = see("sem");
+   ArrayList alist = new ArrayList();
+   for (int i = 0; i < 3; i++) {
+    if (arr[i] != null) {
+     alist.add(arr[i]);
+    }
+   }
+   semText.setText(alist.toString());
+   String[] arr1 = see("math");
+   ArrayList alist1 = new ArrayList();
+   for (int i = 0; i < 3; i++) {
+    if (arr1[i] != null) {
+     alist1.add(arr1[i]);
+    }
+   }
+   mathText.setText(alist1.toString());
+   String[] arr2 = see("eng");
+   ArrayList alist2 = new ArrayList();
+   for (int i = 0; i < 3; i++) {
+    if (arr2[i] != null) {
+     alist2.add(arr2[i]);
+    }
+   }
+   engText.setText(alist2.toString());
+
+  } else if (e.getSource() == reback) {// 返回系統管理者畫面
+   framex.dispose();
+   system_gui sg = new system_gui();
+  }
+
+ }
+
+}
