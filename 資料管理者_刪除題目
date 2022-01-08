@@ -1,0 +1,244 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+public class add_deleteQuestion extends JFrame implements ActionListener {
+ // 刪除題目
+ public void del(String value, String subject) {
+  Connection c = null;
+  Statement stmt = null;
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql = "";
+   if (subject.equals("國文")) {
+    sql = "DELETE FROM chinese " + "WHERE question='" + value + "'";
+   } else if (subject.equals("英文")) {
+    sql = "DELETE FROM english " + "WHERE question='" + value + "'";
+   } else if (subject.equals("數學")) {
+    sql = "DELETE FROM math " + "WHERE question='" + value + "'";
+   }
+   ResultSet rs = stmt.executeQuery(sql);
+
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+ }
+
+ // 選科目、難易度顯示題目
+ public ArrayList search(String getsubject, String getdegree) {
+  Connection conn = null;
+  Statement stmt = null;
+  ArrayList alist = new ArrayList();
+  alist.clear();
+  try {
+   Class.forName("org.postgresql.Driver");
+   conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = conn.createStatement();
+   String sql;
+   sql = " ";
+   if (getsubject.equals("國文")) {
+    y = 1;
+    sql = "SELECT degree, question,a,b,c,d,answer FROM chinese";
+   } else if (getsubject.equals("數學")) {
+    y = 2;
+    sql = " SELECT degree,question, a ,b ,c ,d,answer FROM math";
+   } else if (getsubject.equals("英文")) {
+    y = 3;
+    sql = "SELECT degree ,question ,a,b, c,d answer FROM english ";
+   }
+   ResultSet rs = stmt.executeQuery(sql);
+
+   while (rs.next()) {
+    String degree = rs.getString("degree");
+    String question = rs.getString("question");
+    String a = rs.getString("a");
+    String b = rs.getString("b");
+    String c = rs.getString("c");
+    String d = rs.getString("d");
+    String answer = rs.getString("answer");
+
+    if (getdegree.equals("混合")) {
+     alist.add(degree);
+     alist.add(question);
+     alist.add(a);
+     alist.add(b);
+     alist.add(c);
+     alist.add(d);
+     alist.add(answer);
+    } else if (getdegree.equals("難")) {
+     if (degree.equals("3")) {
+      alist.add(degree);
+      alist.add(question);
+      alist.add(a);
+      alist.add(b);
+      alist.add(c);
+      alist.add(d);
+      alist.add(answer);
+     }
+    } else if (getdegree.equals("中")) {
+     if (degree.equals("2")) {
+      alist.add(degree);
+      alist.add(question);
+      alist.add(a);
+      alist.add(b);
+      alist.add(c);
+      alist.add(d);
+      alist.add(answer);
+     }
+    } else if (getdegree.equals("易")) {
+     if (degree.equals("1")) {
+      alist.add(degree);
+      alist.add(question);
+      alist.add(a);
+      alist.add(b);
+      alist.add(c);
+      alist.add(d);
+      alist.add(answer);
+     }
+    }
+   }
+   rs.close();
+   stmt.close();
+   conn.close();
+
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (conn != null)
+     conn.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return alist;
+ }
+
+ private static JFrame userframe = new JFrame("查詢及管理各科題庫");
+ String subjectString[] = { "國文", "數學", "英文" };
+ JComboBox subject = new JComboBox(subjectString);
+ String degreeString[] = { "混合", "難", "中", "易" };
+ JComboBox degree = new JComboBox(degreeString);
+ String[] columns = new String[] { "難度", "問題", "A", "B", "C", "D", "答案" };
+ DefaultTableModel tableValue = new DefaultTableModel(columns, 0);
+ JTable table = new JTable(tableValue);
+ JScrollPane scrollable = new JScrollPane(table);
+ private static JButton add = new JButton("新增題目");
+ private static JButton delete = new JButton("刪除題目");
+ private static JButton back = new JButton("返回");
+ private static JButton ensure = new JButton("確認");
+ JLabel showLabel = new JLabel();
+ public static int y = 0;
+
+ add_deleteQuestion() {
+  userframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  userframe.setSize(1000, 700);
+  userframe.setLayout(null);
+  userframe.setVisible(true);
+  subject.setBounds(200, 20, 80, 25);
+  degree.setBounds(300, 20, 80, 25);
+  ensure.setBounds(400, 20, 80, 25);
+  showLabel.setBounds(200, 40, 200, 25);
+  scrollable.setBounds(10, 80, 900, 420);
+  add.setBounds(200, 600, 80, 25);
+  delete.setBounds(300, 600, 80, 25);
+  back.setBounds(400, 600, 80, 25);
+  userframe.add(subject);
+  userframe.add(degree);
+  userframe.add(ensure);
+  userframe.add(showLabel);
+  userframe.add(scrollable);
+  userframe.add(add);
+  userframe.add(delete);
+  userframe.add(back);
+
+  ensure.addActionListener(this);
+  add.addActionListener(this);
+  delete.addActionListener(this);
+  back.addActionListener(this);
+
+ }
+
+ public void actionPerformed(ActionEvent e) {
+  Object getsubject = subject.getItemAt(subject.getSelectedIndex());
+  String getsubject1 = getsubject.toString();
+  Object getdegree = degree.getItemAt(degree.getSelectedIndex());
+  String getdegree1 = getdegree.toString();
+  if (e.getSource() == ensure) {// 顯示題目
+   String data = "科目：" + getsubject + "   難度：" + getdegree;
+   showLabel.setText(data);
+   ArrayList alist = new ArrayList();
+   tableValue.setRowCount(0);
+   alist = search(getsubject1, getdegree1);
+   int count = 0;
+   for (int i = 0; i < alist.size(); i += 7) {
+    Object[] obj = { alist.get(0 + count * 7), alist.get(1 + count * 7), alist.get(2 + count * 7),
+      alist.get(3 + count * 7), alist.get(4 + count * 7), alist.get(5 + count * 7),
+      alist.get(6 + count * 7) };
+    tableValue.addRow(obj);
+    count++;
+   }
+  }
+  if (e.getSource() == add) {// 新增題目，顯示新增視窗
+   add_question add = new add_question();
+  }
+  if (e.getSource() == delete) {// 刪除題目
+   int i = table.getSelectedRow();
+   if (i != -1) {
+    int t = JOptionPane.showConfirmDialog(null, "確認刪除？");
+    switch (t) {
+    case JOptionPane.YES_OPTION:
+     String b = (String) tableValue.getValueAt(i, 1);
+     del(b, getsubject1);
+    }
+
+   }
+  } else if (e.getSource() == back) {// 返回
+   userframe.dispose();
+   teacher_gui tg = new teacher_gui();
+  }
+ }
+}
