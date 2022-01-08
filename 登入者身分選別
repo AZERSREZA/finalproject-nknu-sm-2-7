@@ -1,0 +1,60 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class charactergui implements ActionListener {
+ private static JFrame chaframe = new JFrame("身分選別");
+ private static JLabel title = new JLabel("歡迎使用KYUTES");
+ private static JButton chabut1 = new JButton("系統使用者");
+ private static JButton chabut2 = new JButton("系統管理者");
+ private static JButton chabut3 = new JButton("資料管理者");
+ private static JLabel tips = new JLabel("");
+ protected static int x = 0;
+
+ charactergui() {
+
+  chaframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+  chaframe.setSize(400, 400);
+  chaframe.setLayout(null);
+  chaframe.setVisible(true);
+
+  title.setBounds(130, 50, 180, 30);
+  chabut1.setBounds(125, 100, 110, 30);
+  chabut2.setBounds(125, 150, 110, 30);
+  chabut3.setBounds(125, 200, 110, 30);
+  tips.setBounds(55, 30, 260, 30);
+
+  chaframe.add(title);
+  chaframe.add(chabut1);
+  chaframe.add(chabut2);
+  chaframe.add(chabut3);
+
+  chaframe.add(tips);
+
+  chabut1.addActionListener(this);
+  chabut2.addActionListener(this);
+  chabut3.addActionListener(this);
+
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  if (e.getSource() == chabut1) {// 系統使用者
+   x = 1;
+   chaframe.dispose();
+   student_login login = new student_login();
+  } else if (e.getSource() == chabut2) {// 系統管理者
+   x = 2;
+   chaframe.dispose();
+   system_login login = new system_login();
+  } else if (e.getSource() == chabut3) {// 資料管理者
+   x = 3;
+   chaframe.dispose();
+   teacher_login login = new teacher_login();
+  }
+
+ }
+}
