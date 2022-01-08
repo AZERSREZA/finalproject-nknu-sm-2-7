@@ -1,0 +1,8 @@
+public class gui {
+
+ public static void main(String args[]) {
+  //在一開始進入選取角色畫面
+  charactergui chargui = new charactergui();
+
+ }
+}
