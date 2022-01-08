@@ -1,0 +1,121 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+//刪除測驗群組科目
+public class delGroupsub implements ActionListener {
+ public void del(String subject, String pro) {
+  Connection c = null;
+  Statement stmt = null;
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql = "";
+   if (pro.equals("軟工系")) {
+    if (subject.equals("英文"))
+     sql = "UPDATE altersubject SET english=null WHERE subject='sem'";
+    if (subject.equals("數學"))
+     sql = "UPDATE altersubject SET math=null WHERE subject='sem'";
+    if (subject.equals("國文"))
+     sql = "UPDATE altersubject SET chinese=null WHERE subject='sem'";
+   } else if (pro.equals("數學系")) {
+    if (subject.equals("英文"))
+     sql = "UPDATE altersubject SET english=null WHERE subject='math'";
+    if (subject.equals("數學"))
+     sql = "UPDATE altersubject SET math=null WHERE subject='math'";
+    if (subject.equals("國文"))
+     sql = "UPDATE altersubject SET chinese=null WHERE subject='math'";
+   } else if (pro.equals("英文系")) {
+    if (subject.equals("英文"))
+     sql = "UPDATE altersubject SET english=null WHERE subject='eng'";
+    if (subject.equals("數學"))
+     sql = "UPDATE altersubject SET math=null WHERE subject='eng'";
+    if (subject.equals("國文"))
+     sql = "UPDATE altersubject SET chinese=null WHERE subject='eng'";
+   }
+   ResultSet rs = stmt.executeQuery(sql);
+
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+ }
+
+ private static JFrame frame = new JFrame("測驗群組管理");
+ private static JFrame bumpframex = new JFrame("");
+ private JLabel pro = new JLabel("科系");
+ private JLabel sub = new JLabel("科目");
+ private JButton checks = new JButton("確定");
+ String[] subString = { "英文", "國文", "數學" };
+ String[] proString = { "軟工系", "數學系", "英文系" };
+ JComboBox subs = new JComboBox(subString);
+ JComboBox pros = new JComboBox(proString);
+
+ delGroupsub() {
+  frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  frame.setSize(400, 400);
+  frame.setLayout(null);
+  frame.setVisible(true);
+
+  pro.setBounds(75, 50, 60, 30);
+  sub.setBounds(75, 150, 60, 30);
+  pros.setBounds(130, 50, 120, 30);
+  subs.setBounds(130, 150, 120, 30);
+  checks.setBounds(150, 250, 60, 25);
+
+  frame.add(pro);
+  frame.add(sub);
+  frame.add(pros);
+  frame.add(subs);
+  frame.add(checks);
+
+  checks.addActionListener(this);
+
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  if (e.getSource() == checks) {// 刪除測驗群組科目
+   Object getsubject = subs.getItemAt(subs.getSelectedIndex());
+   String getsubject1 = getsubject.toString();
+   Object getpro = pros.getItemAt(pros.getSelectedIndex());
+   String getpro1 = getpro.toString();
+   del(getsubject1, getpro1);
+   JOptionPane.showMessageDialog(bumpframex, "修改成功");
+   frame.dispose();
+   groupManageSub gM = new groupManageSub();// 回到管理測驗群組科目畫面
+  }
+ }
+
+}
