@@ -1,0 +1,351 @@
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.util.concurrent.*;
+
+public class exam extends JFrame implements ActionListener {
+ // 選擇科目，查看題目
+ public ArrayList search(String getsubject) {
+  Connection conn = null;
+  Statement stmt = null;
+  ArrayList alist = new ArrayList();
+  alist.clear();
+  try {
+   Class.forName("org.postgresql.Driver");
+   conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = conn.createStatement();
+   String sql;
+   sql = " ";
+   if (getsubject.equals("國文")) {
+    sql = "SELECT  question,a,b,c,d FROM chinesetest";
+   } else if (getsubject.equals("數學")) {
+    sql = " SELECT question, a ,b ,c ,d FROM mathtest";
+   } else if (getsubject.equals("英文")) {
+    sql = "SELECT question ,a,b, c,d FROM englishtest ";
+   }
+   ResultSet rs = stmt.executeQuery(sql);
+
+   while (rs.next()) {
+    String question = rs.getString("question");
+    String a = rs.getString("a");
+    String b = rs.getString("b");
+    String c = rs.getString("c");
+    String d = rs.getString("d");
+
+    alist.add(question);
+    alist.add(a);
+    alist.add(b);
+    alist.add(c);
+    alist.add(d);
+   }
+
+   rs.close();
+   stmt.close();
+   conn.close();
+
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (conn != null)
+     conn.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return alist;
+ }
+
+ // 輸入成績
+ public void input(String subject, int score) {
+  Connection conn = null;
+  Statement stmt = null;
+  try {
+   Class.forName("org.postgresql.Driver");
+   conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = conn.createStatement();
+   String sql;
+   sql = " ";
+   if (subject.equals("國文")) {
+    sql = "UPDATE testscore SET chinese='" + score + "'" + " WHERE studentid='" + student_login.id + "'";
+   } else if (subject.equals("數學")) {
+    sql = "UPDATE testscore SET math='" + score + "'" + " WHERE studentid='" + student_login.id + "'";
+
+   } else if (subject.equals("英文")) {
+    sql = "UPDATE testscore SET english='" + score + "'" + " WHERE studentid='" + student_login.id + "'";
+   }
+   ResultSet rs = stmt.executeQuery(sql);
+   rs.close();
+   stmt.close();
+   conn.close();
+
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (conn != null)
+     conn.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+ }
+
+ // 對答案
+ public int checkanswer(String subject, String[] arr) {
+  Connection conn = null;
+  Statement stmt = null;
+  int score = 0;
+  try {
+   Class.forName("org.postgresql.Driver");
+   conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = conn.createStatement();
+   String sql;
+   sql = " ";
+   if (subject.equals("國文")) {
+    sql = "SELECT  answer FROM chinesetest";
+   } else if (subject.equals("數學")) {
+    sql = " SELECT  answer FROM mathtest";
+   } else if (subject.equals("英文")) {
+    sql = "SELECT answer FROM englishtest";
+   }
+
+   ResultSet rs = stmt.executeQuery(sql);
+   String[] arrsql = new String[20];
+   int i = 0;
+   while (rs.next()) {
+
+    arrsql[i] = rs.getString("answer");
+
+    if (arrsql[i].equals(arr[i])) {
+     score += 5;
+    }
+    i++;
+   }
+
+   System.out.println(sql);
+   stmt.executeQuery(sql);
+
+   rs.close();
+   stmt.close();
+   conn.close();
+
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (conn != null)
+     conn.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return score;
+ }
+
+ private static JFrame userframe = new JFrame("考試介面");
+ String subjectString[] = { "國文", "數學", "英文" };
+ JComboBox subject = new JComboBox(subjectString);
+ String[] columns = new String[] { "問題", "A", "B", "C", "D" };
+ DefaultTableModel tableValue = new DefaultTableModel(columns, 0);
+ JTable table = new JTable(tableValue);
+ JScrollPane scrollable = new JScrollPane(table);
+ JTextField useranswer = new JTextField(80);
+ JFrame bumpframe = new JFrame();
+
+ int second = 5, minute = 0;// TIMER'S APPLICATION
+ String ddsecond, ddminute;
+ DecimalFormat dformat = new DecimalFormat("00");
+ Timer tim;
+ String userans;
+ private static JButton timer = new JButton("開始考試");
+ private static JButton ensure = new JButton("確認");
+ private static JButton printout = new JButton("送出");
+ JLabel testLabel = new JLabel("請以ABCDC這樣的形式輸入");
+ JLabel timelabel = new JLabel();
+ JLabel showLabel = new JLabel();
+ ImageIcon icon1 = new ImageIcon("/Users/ashleyjuan/Desktop/s.jpeg");
+ JPanel panel = new JPanel();
+ JLabel label1 = new JLabel(icon1);
+
+ exam() {
+  timelabel.setFont(new java.awt.Font("Dialog", 1, 15));
+  testLabel.setFont(new java.awt.Font("Dialog", 1, 15));
+  showLabel.setFont(new java.awt.Font("Dialog", 1, 15));
+  testLabel.setForeground(Color.ORANGE);
+  showLabel.setForeground(Color.ORANGE);
+  timelabel.setForeground(Color.ORANGE);
+
+  label1.setBounds(0, 0, 1000, 1000);
+  userframe.getLayeredPane().add(label1, new Integer(Integer.MIN_VALUE));
+  icon1.setImage(icon1.getImage().getScaledInstance(1000, 1000, 500));
+  JPanel panelTop = new JPanel();
+  panelTop = (JPanel) userframe.getContentPane();
+  panelTop.setOpaque(false);
+  panel.setOpaque(false);
+  userframe.add(panel);
+  timelabel.setFont(new java.awt.Font("Dialog", 1, 15));
+
+  userframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  userframe.setSize(1000, 700);
+  userframe.setLayout(null);
+  userframe.setVisible(true);
+
+  subject.setBounds(370, 20, 80, 25);
+  ensure.setBounds(520, 20, 80, 25);
+  scrollable.setBounds(100, 80, 800, 420);
+  useranswer.setBounds(200, 555, 600, 25);
+  printout.setBounds(450, 600, 100, 25);
+  testLabel.setBounds(420, 490, 500, 40);
+  timelabel.setBounds(700, 13, 350, 40);
+  showLabel.setBounds(450, 40, 250, 50);
+  timer.setBounds(440, 615, 100, 25);
+  userframe.add(subject);
+
+  userframe.add(ensure);
+  userframe.add(scrollable);
+  userframe.add(useranswer);
+  userframe.add(testLabel);
+  userframe.add(printout);
+  userframe.add(timer);
+  userframe.add(timelabel);
+  userframe.add(showLabel);
+
+  ensure.addActionListener(this);
+  printout.addActionListener(this);
+  timer.addActionListener(this);
+  printout.setVisible(false);
+  simpleTimer();
+ }
+
+ public void actionPerformed(ActionEvent e) {
+  Object getsubject = subject.getItemAt(subject.getSelectedIndex());
+  String getsubject1 = getsubject.toString();
+  String answer = useranswer.getText();
+  if (e.getSource() == ensure) {// 選擇考試內容
+   Object getsubject2 = subject.getItemAt(subject.getSelectedIndex());
+   String getsubject3 = getsubject2.toString();
+
+   String data = "科目：  " + getsubject3 + "          ";
+   showLabel.setText(data + "");
+
+   ArrayList alist = new ArrayList();
+   tableValue.setRowCount(0);
+   alist = search(getsubject1);
+   int count = 0;
+   for (int i = 0; i < alist.size(); i += 5) {
+    Object[] obj = { alist.get(0 + count * 5), alist.get(1 + count * 5), alist.get(2 + count * 5),
+      alist.get(3 + count * 5), alist.get(4 + count * 5) };
+    tableValue.addRow(obj);
+    count++;
+   }
+  }
+  if (e.getSource() == printout) {// 送出答案
+   second = 0;
+   minute = 15;
+   userans = useranswer.getText();
+   useranswer.setText("");
+   useranswer.setVisible(false);
+   tim.stop();
+   timelabel.setText("剩餘時間 " + "00:00");
+   timer.setVisible(false);
+   JOptionPane.showMessageDialog(bumpframe, "確定送出嗎？");
+   String[] arr = new String[20];
+   arr = answer.split("");
+   int score = checkanswer(getsubject1, arr);
+   input(getsubject1, score);
+   JOptionPane.showMessageDialog(bumpframe, "您的分數為:" + score);
+   // 傳送成績至後端;
+
+   JOptionPane.showMessageDialog(bumpframe, "成績已上傳完成");
+   userframe.dispose();
+   student_gui sg = new student_gui();
+  }
+  if (e.getSource() == timer) {// 開始測驗，計時器開始
+   minute = 15;
+   second = 0;
+   timelabel.setText("剩餘時間 " + "15:00");
+   tim.start();
+   useranswer.setVisible(true);
+   timer.setVisible(false);
+   printout.setVisible(true);
+  }
+
+ }
+
+ // 計時器
+ public void simpleTimer() {
+
+  tim = new Timer(1000, new ActionListener() {
+   @Override
+   public void actionPerformed(ActionEvent e) {
+    ddsecond = dformat.format(second);
+    ddminute = dformat.format(minute);
+    timelabel.setText("剩餘時間 " + ddminute + ":" + " " + ddsecond);
+    second--;
+    if (second == -1) {
+     second = 59;
+     minute--;
+     ddsecond = dformat.format(second);
+     ddminute = dformat.format(minute);
+     timelabel.setText(ddminute + ":" + " " + ddsecond);
+    }
+    if (minute == 0 && second == 0) {
+     JOptionPane.showMessageDialog(bumpframe, "時間到");
+     userans = useranswer.getText();
+     useranswer.setText("");
+     useranswer.setVisible(false);
+     tim.stop();
+     timelabel.setText("剩餘時間 " + "00:00");
+     timer.setVisible(true);
+    }
+   }
+  });
