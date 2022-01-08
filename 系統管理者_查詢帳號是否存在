@@ -1,0 +1,278 @@
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+public class GroupManage implements ActionListener {
+ // 查詢帳號是否存在
+ public String check(String userid) {
+  Connection c = null;
+  Statement stmt = null;
+  String answer = "false";
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql;
+   sql = "SELECT  studentid FROM studentaccount";
+   ResultSet rs = stmt.executeQuery(sql);
+
+   // 展开结果集数据库
+   while (rs.next()) {
+    String studentid = rs.getString("studentid");
+    // 输出数据
+    if (studentid.equals(userid)) {
+     answer = "true";
+     break;
+    }
+   }
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return answer;
+ }
+
+ // 顯示帳號
+ public String[] show(String searchx) {
+  Connection c = null;
+  Statement stmt = null;
+  String[] arr = new String[7];
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql;
+   sql = "SELECT studentid,major,grade FROM studentaccount" + " where studentid='" + searchx + "'";
+   ResultSet rs = stmt.executeQuery(sql);
+   while (rs.next()) {
+    String id = rs.getString("studentid");
+    String major = rs.getString("major");
+    String grade = rs.getString("grade");
+    arr[0] = id;
+    arr[1] = major;
+    arr[2] = grade;
+   }
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return arr;
+ }
+
+ // 更換主修、年級
+ public void revise(int check, String id, String value) {
+  Connection c = null;
+  Statement stmt = null;
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql = "";
+   if (check == 1) {// 主修
+    if (value.equals("軟體系"))
+     sql = "UPDATE studentaccount SET major='sem' WHERE studentid='" + id + "'";
+    if (value.equals("數學系"))
+     sql = "UPDATE studentaccount SET major='math' WHERE studentid='" + id + "'";
+    if (value.equals("英文系"))
+     sql = "UPDATE studentaccount SET major='eng' WHERE studentid='" + id + "'";
+   } else if (check == 2) {// 年級
+    sql = "UPDATE studentaccount SET grade='" + value + "'" + " WHERE studentid='" + id + "'";
+   }
+
+   ResultSet rs = stmt.executeQuery(sql);
+
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+ }
+
+ private JLabel searchid = new JLabel("搜尋帳號 :");
+ private JLabel id = new JLabel("帳號:");
+ private JLabel showid = new JLabel();
+ private JLabel pro = new JLabel("主修:");
+ private JLabel age = new JLabel("年級:");
+ private JButton search = new JButton("搜尋");
+ private JLabel showpro = new JLabel();
+ private JLabel showage = new JLabel();
+ private JButton change1 = new JButton("修改");
+ private JButton change2 = new JButton("修改");
+ private JButton complete = new JButton("完成");
+ public static JTextField searchtext = new JTextField(20);
+ String[] proString = { "軟體系", "英文系", "數學系" };
+ String[] ageString = { "一", "二", "三", "四" };
+ JComboBox pros = new JComboBox(proString);
+ JComboBox ages = new JComboBox(ageString);
+ private static JFrame framex = new JFrame("");
+ private static JFrame bumpframex = new JFrame("");
+ protected static int check = 0;
+
+ GroupManage() {
+
+  Color color1 = new Color(200, 200, 0);
+  Color color2 = new Color(0, 200, 100);
+  Color color3 = new Color(200, 100, 100);
+
+  framex.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  framex.setSize(400, 400);
+  framex.setLayout(null);
+  framex.setVisible(true);
+
+  searchid.setBounds(40, 50, 80, 25);
+  searchtext.setBounds(110, 50, 100, 25);
+  search.setBounds(220, 50, 60, 25);
+
+  id.setBounds(50, 90, 300, 25);
+  showid.setBounds(110, 90, 100, 25);
+  pro.setBounds(50, 130, 60, 25);
+  showpro.setBounds(110, 130, 100, 25);
+  pros.setBounds(220, 130, 100, 25);
+  change1.setBounds(320, 130, 60, 25);
+
+  age.setBounds(50, 170, 60, 25);
+  showage.setBounds(110, 170, 100, 25);
+  ages.setBounds(220, 170, 100, 25);
+  change2.setBounds(320, 170, 60, 25);
+
+  complete.setBounds(140, 300, 60, 25);
+
+  framex.add(searchid);
+  framex.add(searchtext);
+  framex.add(search);
+  framex.add(id);
+  framex.add(showid);
+  framex.add(pro);
+  framex.add(pros);
+  framex.add(showpro);
+  framex.add(change1);
+  framex.add(age);
+  framex.add(ages);
+  framex.add(showage);
+  framex.add(change2);
+  framex.add(complete);
+
+  search.addActionListener(this);
+  change1.addActionListener(this);
+  change2.addActionListener(this);
+  complete.addActionListener(this);
+
+  complete.setVisible(true);
+  pros.setVisible(true);
+  ages.setVisible(true);
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  String searchx = searchtext.getText();
+  System.out.println(searchx);
+  Object getage = ages.getItemAt(ages.getSelectedIndex());
+  String getage1 = getage.toString();
+  Object getpro = pros.getItemAt(pros.getSelectedIndex());
+  String getpro1 = getpro.toString();
+  String type = check(searchx);
+  if (e.getSource() == search && type.equals("true")) {// 查詢帳號是否存在
+   JOptionPane.showMessageDialog(bumpframex, "搜尋成功");
+   String[] arr = new String[3];
+   arr = show(searchx);
+   showid.setText(arr[0]);
+   showpro.setText(arr[1]);
+   showage.setText(arr[2]);
+  } else if (e.getSource() == search && type.equals("false")) {
+   JOptionPane.showMessageDialog(bumpframex, "沒有此帳號");
+  }
+
+  if (e.getSource() == change1) {// 修改主修
+   check = 1;
+   revise(check, searchx, getpro1);
+   JOptionPane.showMessageDialog(bumpframex, "修改成功");
+
+  }
+  if (e.getSource() == change2) {// 修改年級
+   check = 2;
+   revise(check, searchx, getage1);
+   JOptionPane.showMessageDialog(bumpframex, "修改成功");
+  }
+  if (e.getSource() == complete) {
+   framex.dispose();
+   system_gui sg = new system_gui();
+  }
+
+ }
+
+}
