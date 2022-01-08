@@ -1,0 +1,238 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
+
+public class studentAssign extends JFrame implements ActionListener {
+ //創建新帳號
+ public void assign(String user, String pass, String email, String nickname, String gender, String pros,
+   String age) {
+  Connection c = null;
+  Statement stmt = null;
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql;
+   sql = "INSERT INTO studentaccount VALUES('" + user + "', '" + nickname + "', '" + pass + "','" + pros
+     + "','" + age + "', '" + gender + "',  '" + email + "'  ) ";
+
+   ResultSet rs = stmt.executeQuery(sql);
+
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+ }
+
+ private static JFrame userframe = new JFrame("註冊 ");
+ private static JLabel newuser = new JLabel("新增帳號");
+ private static JLabel newpass = new JLabel("新增密碼");
+ private static JLabel newcheck = new JLabel("確認密碼");
+ private static JLabel newemail = new JLabel("電郵帳號");
+ private static JLabel nickname = new JLabel("暱稱");
+ private static JLabel gender1 = new JLabel("性別認同");
+ private static JLabel age1 = new JLabel("年級選取");
+ private static JLabel pro1 = new JLabel("科系選取");
+ private static JLabel data = new JLabel(" ex：男/女                ex:一/二/三/四           ex:sem/eng/math");
+ private static JTextField usertext = new JTextField(20);
+ private static JTextField passtext = new JTextField(20);
+ private static JTextField checktext = new JTextField(20);
+ private static JTextField age = new JTextField(5);
+ private static JTextField pro = new JTextField(10);
+ private static JTextField gender = new JTextField(5);
+ private static JTextField emailtext = new JTextField(20);
+ private static JTextField nicknametext = new JTextField(10);
+ private static JButton ensure = new JButton("確認");
+ private static JButton turnback = new JButton("返回");
+ private static JFrame bumpframe1 = new JFrame("");
+ private static JFrame bumpframe2 = new JFrame("");
+ private static JButton apply = new JButton("確定申請");
+
+ studentAssign() {
+  userframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  userframe.setSize(500, 500);
+  userframe.setLayout(null);
+  userframe.setVisible(true);
+
+  newuser.setBounds(90, 25, 60, 25);
+  newpass.setBounds(90, 55, 60, 25);
+  newcheck.setBounds(90, 85, 60, 25);
+  newemail.setBounds(90, 115, 60, 25);
+  nickname.setBounds(90, 145, 60, 25);
+  usertext.setBounds(165, 25, 180, 25);
+  passtext.setBounds(165, 55, 180, 25);
+  checktext.setBounds(165, 85, 180, 25);
+  data.setBounds(60, 235, 450, 15);
+  emailtext.setBounds(165, 115, 180, 25);
+  nicknametext.setBounds(165, 145, 180, 25);
+  ensure.setBounds(185, 360, 60, 25);
+  turnback.setBounds(185, 390, 60, 25);
+  apply.setBounds(165, 420, 100, 30);
+  gender.setBounds(60, 210, 100, 25);
+  gender1.setBounds(85, 180, 60, 30);
+  age.setBounds(190, 210, 100, 25);
+  age1.setBounds(215, 180, 60, 30);
+  pro.setBounds(320, 210, 100, 25);
+  pro1.setBounds(345, 180, 60, 30);
+
+  userframe.add(data);
+  userframe.add(newuser);
+  userframe.add(newpass);
+  userframe.add(newcheck);
+  userframe.add(newemail);
+  userframe.add(usertext);
+  userframe.add(passtext);
+  userframe.add(checktext);
+  userframe.add(emailtext);
+  userframe.add(ensure);
+  userframe.add(turnback);
+  userframe.add(apply);
+  userframe.add(gender);
+  userframe.add(gender1);
+  userframe.add(age);
+  userframe.add(age1);
+  userframe.add(pro);
+  userframe.add(pro1);
+
+  turnback.addActionListener(this);
+  ensure.addActionListener(this);
+  apply.addActionListener(this);
+  age.addActionListener(this);
+  pro.addActionListener(this);
+  gender.addActionListener(this);
+
+  apply.setVisible(false);
+
+  userframe.add(nickname);
+  userframe.add(nicknametext);
+
+ }
+
+ public void actionPerformed(ActionEvent e) {
+
+  String user = usertext.getText();
+  String pass = passtext.getText();
+  String check = checktext.getText();
+  String email = emailtext.getText();
+  String agetext = age.getText();
+  String gendertext = gender.getText();
+  String protext = pro.getText();
+  String agei = "";
+  String genderi = "";
+  String proi = "";
+  String nickname = nicknametext.getText();
+  String pros1 = "";
+  String age1 = "";
+  String gender1 = "";
+
+  char[] unvaildChar = { ' ', '\'', '"', '?', '*', '~', ',', '!' };//非法字元阻擋
+  boolean isNumeric = true;
+  boolean anything = true;
+  //欄位空白阻擋
+  if (user.equals("")) {
+   anything = false;
+  }
+  if (pass.equals("")) {
+   anything = false;
+  }
+  if (check.equals("")) {
+   anything = false;
+  }
+  if (email.equals("")) {
+   anything = false;
+  }
+  if (nickname.equals("")) {
+   anything = false;
+  }
+  if (nickname.getBytes().length <= nickname.length()) {//暱稱中文字確認
+   isNumeric = false;
+  }
+
+  System.out.println(pros1 + " " + age1 + " " + gender1);
+
+  if (anything == false && e.getSource() == ensure) {
+   JOptionPane.showMessageDialog(bumpframe1, "任一處不得為空白");
+   apply.setVisible(false);
+  }
+
+  if (e.getSource() == turnback) {
+   userframe.dispose();
+   student_login log = new student_login();
+  }
+
+  a: if (!passtext.equals("") & !usertext.equals("") & !checktext.equals("") & !emailtext.equals("")
+    & !nicknametext.equals("") && e.getSource() == ensure) {
+   for (char ch : unvaildChar)
+    if (user.contains(Character.toString(ch)) | pass.contains(Character.toString(ch))
+      | check.contains(Character.toString(ch)) | email.contains(Character.toString(ch))) {
+     JOptionPane.showMessageDialog(bumpframe1, "帳密電郵存在非法字元");
+     apply.setVisible(false);
+     break a;
+    }
+
+   if (isNumeric == false) {
+    JOptionPane.showMessageDialog(bumpframe1, "學號僅限用數字，暱稱需有中文字");
+    apply.setVisible(false);
+    break a;
+   }
+
+   if (user.length() > 18 || user.length() < 6 || pass.length() > 18 || pass.length() < 6
+     || check.length() >= 18 || check.length() < 6) {
+    JOptionPane.showMessageDialog(bumpframe1, "帳密字數需介於6~18字元");
+    apply.setVisible(false);
+    break a;
+   }
+
+   else if (!pass.equals(check)) {
+    JOptionPane.showMessageDialog(bumpframe1, "前後密碼不一致");
+    apply.setVisible(false);
+    break a;
+   }
+
+   else {
+    apply.setVisible(true);
+    turnback.setVisible(false);
+    JOptionPane.showMessageDialog(bumpframe1, "申請成功");
+    assign(user, pass, email, nickname, gendertext, protext, agetext);
+    turnback.setVisible(false);
+    break a;
+   }
+  }
+
+  if (e.getSource() == apply) {
+   JOptionPane.showMessageDialog(bumpframe1, "帳號已創立");
+   {
+    userframe.dispose();
+    student_login sl = new student_login();
+   }
+  }
+ }
+}
