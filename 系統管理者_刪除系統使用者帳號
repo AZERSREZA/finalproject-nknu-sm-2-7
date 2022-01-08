@@ -1,0 +1,352 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
+public class show_stuAccSystem extends JFrame implements ActionListener {
+ // 刪除系統使用者帳號
+ public void del(String value) {
+  Connection c = null;
+  Statement stmt = null;
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql;
+   sql = "DELETE FROM studentaccount " + "WHERE studentid='" + value + "'";
+
+   ResultSet rs = stmt.executeQuery(sql);
+
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+ }
+
+ // 搜尋系統使用者
+ public ArrayList search(String getmajor, String getgrade, String getgender) {
+  Connection conn = null;
+  Statement stmt = null;
+  ArrayList alist = new ArrayList();
+  alist.clear();
+  try {
+   Class.forName("org.postgresql.Driver");
+   conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = conn.createStatement();
+   String sql;
+   sql = " ";
+   if (getmajor.equals("全部")) {
+    sql = "SELECT * FROM studentaccount";
+   } else if (getmajor.equals("數學系")) {
+    sql = " SELECT * FROM studentaccount WHERE major='math'";
+   } else if (getmajor.equals("英文系")) {
+    sql = " SELECT * FROM studentaccount WHERE major='eng'";
+   } else if (getmajor.equals("軟體系")) {
+    sql = " SELECT * FROM studentaccount WHERE major='sem'";
+   }
+   ResultSet rs = stmt.executeQuery(sql);
+
+   while (rs.next()) {
+    String studentid = rs.getString("studentid");
+    String name = rs.getString("name");
+    String password = rs.getString("password");
+    String major = rs.getString("major");
+    String grade = rs.getString("grade");
+    String gender = rs.getString("gender");
+    String email = rs.getString("gmail");
+
+    if (getgrade.equals("全年級")) {
+     if (getgender.equals("全部")) {
+      alist.add(studentid);
+      alist.add(name);
+      alist.add(password);
+      alist.add(major);
+      alist.add(grade);
+      alist.add(gender);
+      alist.add(email);
+     } else if (getgender.equals("女")) {
+      if (gender.equals("女")) {
+       alist.add(studentid);
+       alist.add(name);
+       alist.add(password);
+       alist.add(major);
+       alist.add(grade);
+       alist.add(gender);
+       alist.add(email);
+      }
+     } else if (getgender.equals("男")) {
+      if (gender.equals("男")) {
+       alist.add(studentid);
+       alist.add(name);
+       alist.add(password);
+       alist.add(major);
+       alist.add(grade);
+       alist.add(gender);
+       alist.add(email);
+      }
+     }
+    } else if (getgrade.equals("一")) {
+     if (grade.equals("一")) {
+      if (getgender.equals("全部")) {
+       alist.add(studentid);
+       alist.add(name);
+       alist.add(password);
+       alist.add(major);
+       alist.add(grade);
+       alist.add(gender);
+       alist.add(email);
+      } else if (getgender.equals("女")) {
+       if (gender.equals("女")) {
+        alist.add(studentid);
+        alist.add(name);
+        alist.add(password);
+        alist.add(major);
+        alist.add(grade);
+        alist.add(gender);
+        alist.add(email);
+       }
+      } else if (getgender.equals("男")) {
+       if (gender.equals("男")) {
+        alist.add(studentid);
+        alist.add(name);
+        alist.add(password);
+        alist.add(major);
+        alist.add(grade);
+        alist.add(gender);
+        alist.add(email);
+       }
+      }
+     }
+    } else if (getgrade.equals("二")) {
+     if (grade.equals("二")) {
+      if (getgender.equals("全部")) {
+       alist.add(studentid);
+       alist.add(name);
+       alist.add(password);
+       alist.add(major);
+       alist.add(grade);
+       alist.add(gender);
+       alist.add(email);
+      } else if (getgender.equals("女")) {
+       if (gender.equals("女")) {
+        alist.add(studentid);
+        alist.add(name);
+        alist.add(password);
+        alist.add(major);
+        alist.add(grade);
+        alist.add(gender);
+        alist.add(email);
+       }
+      } else if (getgender.equals("男")) {
+       if (gender.equals("男")) {
+        alist.add(studentid);
+        alist.add(name);
+        alist.add(password);
+        alist.add(major);
+        alist.add(grade);
+        alist.add(gender);
+        alist.add(email);
+       }
+      }
+     }
+    } else if (getgrade.equals("三")) {
+     if (grade.equals("三")) {
+      if (getgender.equals("全部")) {
+       alist.add(studentid);
+       alist.add(name);
+       alist.add(password);
+       alist.add(major);
+       alist.add(grade);
+       alist.add(gender);
+       alist.add(email);
+      } else if (getgender.equals("女")) {
+       if (gender.equals("女")) {
+        alist.add(studentid);
+        alist.add(name);
+        alist.add(password);
+        alist.add(major);
+        alist.add(grade);
+        alist.add(gender);
+        alist.add(email);
+       }
+      } else if (getgender.equals("男")) {
+       if (gender.equals("男")) {
+        alist.add(studentid);
+        alist.add(name);
+        alist.add(password);
+        alist.add(major);
+        alist.add(grade);
+        alist.add(gender);
+        alist.add(email);
+       }
+      }
+     }
+    } else if (getgrade.equals("四")) {
+     if (grade.equals("四")) {
+      if (getgender.equals("全部")) {
+       alist.add(studentid);
+       alist.add(name);
+       alist.add(password);
+       alist.add(major);
+       alist.add(grade);
+       alist.add(gender);
+       alist.add(email);
+      } else if (getgender.equals("女")) {
+       if (gender.equals("女")) {
+        alist.add(studentid);
+        alist.add(name);
+        alist.add(password);
+        alist.add(major);
+        alist.add(grade);
+        alist.add(gender);
+        alist.add(email);
+       }
+      } else if (getgender.equals("男")) {
+       if (gender.equals("男")) {
+        alist.add(studentid);
+        alist.add(name);
+        alist.add(password);
+        alist.add(major);
+        alist.add(grade);
+        alist.add(gender);
+        alist.add(email);
+       }
+      }
+     }
+    }
+
+   }
+
+   rs.close();
+   stmt.close();
+   conn.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (conn != null)
+     conn.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return alist;
+ }
+
+ private static JFrame userframe = new JFrame("帳號管理");
+ String majorString[] = { "全部", "數學系", "英文系", "軟體系" };
+ JComboBox major = new JComboBox(majorString);
+ String gradeString[] = { "全年級", "一", "二", "三", "四" };
+ JComboBox grade = new JComboBox(gradeString);
+ String genderString[] = { "全部", "男", "女" };
+ JComboBox gender = new JComboBox(genderString);
+
+ private static JButton add = new JButton("新增帳號");
+ private static JButton delete = new JButton("刪除帳號");
+ private static JButton reback = new JButton("返回");
+
+ String[] columns = new String[] { "學生帳號", "暱稱", "密碼", "主修", "年級", "性別", "email" };
+ DefaultTableModel tableValue = new DefaultTableModel(columns, 0);
+ JTable table = new JTable(tableValue);
+ JScrollPane scrollable = new JScrollPane(table);
+
+ private static JButton ensure = new JButton("確認");
+
+ show_stuAccSystem() {
+  userframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  userframe.setSize(1000, 1000);
+  userframe.setLayout(null);
+  userframe.setVisible(true);
+  major.setBounds(200, 20, 80, 25);
+  grade.setBounds(300, 20, 80, 25);
+  gender.setBounds(400, 20, 80, 25);
+  ensure.setBounds(500, 20, 80, 25);
+  scrollable.setBounds(10, 80, 900, 420);
+  add.setBounds(200, 600, 80, 25);
+  delete.setBounds(300, 600, 80, 25);
+  reback.setBounds(400, 600, 80, 25);
+
+  userframe.add(major);
+  userframe.add(grade);
+  userframe.add(gender);
+  userframe.add(ensure);
+  userframe.add(scrollable);
+  userframe.add(add);
+  userframe.add(delete);
+  userframe.add(reback);
+
+  ensure.addActionListener(this);
+  add.addActionListener(this);
+  delete.addActionListener(this);
+  reback.addActionListener(this);
+
+ }
+
+ public void actionPerformed(ActionEvent e) {
+  Object getmajor = major.getItemAt(major.getSelectedIndex());
+  String getmajor1 = getmajor.toString();
+  Object getgrade = grade.getItemAt(grade.getSelectedIndex());
+  String getgrade1 = getgrade.toString();
+  Object getgender = gender.getItemAt(gender.getSelectedIndex());
+  String getgender1 = getgender.toString();
+  if (e.getSource() == ensure) {// 查看系統使用者
+   ArrayList alist = new ArrayList();
+   tableValue.setRowCount(0);
+   alist = search(getmajor1, getgrade1, getgender1);
+   int count = 0;
+   for (int i = 0; i < alist.size(); i += 7) {
+    Object[] obj = { alist.get(0 + count * 7), alist.get(1 + count * 7), alist.get(2 + count * 7),
+      alist.get(3 + count * 7), alist.get(4 + count * 7), alist.get(5 + count * 7),
+      alist.get(6 + count * 7) };
+    tableValue.addRow(obj);
+    count++;
+   }
+  } else if (e.getSource() == add) {// 新增系統使用者，跳轉至新增使用者畫面
+   userframe.dispose();
+   add_userAccount ad = new add_userAccount();
+  } else if (e.getSource() == delete) {// 刪除系統使用者
+   int i = table.get
