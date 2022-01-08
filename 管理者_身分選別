@@ -1,0 +1,46 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+
+public class select_accountManage implements ActionListener {
+ private static JButton userma = new JButton("系統使用者");
+ private static JButton testma = new JButton("資料管理者");
+ private static JButton back = new JButton("返回");
+ private static JFrame sysframe = new JFrame("帳號管理 ");
+
+ select_accountManage() {
+  sysframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  sysframe.setSize(400, 300);
+  sysframe.setLayout(null);
+  sysframe.setVisible(true);
+
+  userma.setBounds(125, 70, 150, 30);
+  testma.setBounds(125, 120, 150, 30);
+  back.setBounds(160, 200, 80, 30);
+
+  sysframe.add(userma);
+  sysframe.add(testma);
+  sysframe.add(back);
+
+  userma.addActionListener(this);
+  testma.addActionListener(this);
+  back.addActionListener(this);
+
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  if (e.getSource() == userma) {// 選擇系統使用者
+   sysframe.dispose();
+   show_stuAccSystem sw = new show_stuAccSystem();
+  } else if (e.getSource() == testma) {// 選擇資料使用者
+   sysframe.dispose();
+   show_tchAccSystem ss = new show_tchAccSystem();
+  } else if (e.getSource() == back) {// 返回
+   sysframe.dispose();
+   system_gui sg = new system_gui();
+  }
+ }
+}
