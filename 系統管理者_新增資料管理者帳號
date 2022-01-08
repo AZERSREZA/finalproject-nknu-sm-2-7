@@ -1,0 +1,139 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.*;
+
+public class add_teacherAccount extends JFrame implements ActionListener {
+ // 新增資料管理者帳號
+ public void assign(String user, String pass, String email, String nickname, String gender) {
+  Connection c = null;
+  Statement stmt = null;
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql;
+   sql = "INSERT INTO teacheraccount VALUES('" + user + "', '" + nickname + "', '" + pass + "','" + gender
+     + "',  '" + email + "'  ) ";
+
+   ResultSet rs = stmt.executeQuery(sql);
+
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+ }
+
+ private static JFrame userframe = new JFrame("新增帳號 ");
+ private static JLabel newuser = new JLabel("新增帳號");
+ private static JLabel newpass = new JLabel("新增密碼");
+ private static JLabel newcheck = new JLabel("確認密碼");
+ private static JLabel newemail = new JLabel("電郵帳號");
+ private static JLabel nickname = new JLabel("暱稱");
+ private static JLabel gender1 = new JLabel("性別認同");
+ private static JLabel data = new JLabel(" ex：男/女    ");
+ private static JTextField usertext = new JTextField(20);
+ private static JTextField passtext = new JTextField(20);
+ private static JTextField checktext = new JTextField(20);
+ private static JTextField gender = new JTextField(5);
+ private static JTextField emailtext = new JTextField(20);
+ private static JTextField nicknametext = new JTextField(10);
+ private static JButton ensure = new JButton("確認");
+ private static JButton turnback = new JButton("返回");
+ private static JFrame bumpframe1 = new JFrame("");
+ private static JFrame bumpframe2 = new JFrame("");
+
+ add_teacherAccount() {
+  userframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  userframe.setSize(500, 400);
+  userframe.setLayout(null);
+  userframe.setVisible(true);
+
+  newuser.setBounds(90, 25, 60, 25);
+  newpass.setBounds(90, 55, 60, 25);
+  newcheck.setBounds(90, 85, 60, 25);
+  newemail.setBounds(90, 115, 60, 25);
+  nickname.setBounds(90, 145, 60, 25);
+  usertext.setBounds(165, 25, 180, 25);
+  passtext.setBounds(165, 55, 180, 25);
+  checktext.setBounds(165, 85, 180, 25);
+  data.setBounds(260, 180, 450, 25);
+  emailtext.setBounds(165, 115, 180, 25);
+  nicknametext.setBounds(165, 145, 180, 25);
+  ensure.setBounds(185, 280, 60, 25);
+  turnback.setBounds(185, 320, 60, 25);
+  gender.setBounds(165, 180, 100, 25);
+  gender1.setBounds(85, 180, 60, 30);
+
+  userframe.add(data);
+  userframe.add(newuser);
+  userframe.add(newpass);
+  userframe.add(newcheck);
+  userframe.add(newemail);
+  userframe.add(usertext);
+  userframe.add(passtext);
+  userframe.add(checktext);
+  userframe.add(emailtext);
+  userframe.add(ensure);
+  userframe.add(turnback);
+
+  userframe.add(gender);
+  userframe.add(gender1);
+
+  turnback.addActionListener(this);
+  ensure.addActionListener(this);
+  gender.addActionListener(this);
+
+  userframe.add(nickname);
+  userframe.add(nicknametext);
+
+ }
+
+ public void actionPerformed(ActionEvent e) {
+
+  String user = usertext.getText();
+  String pass = passtext.getText();
+  String check = checktext.getText();
+  String email = emailtext.getText();
+  String gendertext = gender.getText();
+  String nickname = nicknametext.getText();
+
+  if (e.getSource() == ensure) {// 新增資料管理者帳號
+   assign(user, pass, email, nickname, gendertext);
+   JOptionPane.showMessageDialog(bumpframe1, "申請成功");
+
+  }
+  if (e.getSource() == turnback) {// 返回查帳號管理中資料管理者畫面
+   userframe.dispose();
+   show_tchAccSystem sA = new show_tchAccSystem();
+
+  }
+ }
+}
