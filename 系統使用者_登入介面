@@ -1,0 +1,156 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
+
+import java.sql.*;
+
+public class teacher_login implements ActionListener {
+ // 查詢帳號，進行認證
+ public String check(String username, String userpassword) {
+  Connection c = null;
+  Statement stmt = null;
+  String answer = "false";
+  try {
+   Class.forName("org.postgresql.Driver");
+   c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/java", "postgres", "030741");
+   System.out.println("Opened database successfully");
+   stmt = c.createStatement();
+   String sql;
+   sql = "SELECT  teacherid, password FROM teacheraccount";
+   ResultSet rs = stmt.executeQuery(sql);
+
+   // 展开结果集数据库
+   while (rs.next()) {
+    String teacherid = rs.getString("teacherid");
+    String password = rs.getString("password");
+    // 输出数据
+    if ((teacherid.equals(username) && password.equals(userpassword))) {
+     answer = "true";
+     break;
+    }
+   }
+   rs.close();
+   stmt.close();
+   c.close();
+  } catch (SQLException se) {
+   // 处理 JDBC 错误
+   se.printStackTrace();
+  } catch (Exception e) {
+   // 处理 Class.forName 错误
+   e.printStackTrace();
+  } finally {
+   // 关闭资源
+   try {
+    if (stmt != null)
+     stmt.close();
+   } catch (SQLException se2) {
+   } // 什么都不做
+   try {
+    if (c != null)
+     c.close();
+   } catch (SQLException se) {
+    se.printStackTrace();
+   }
+  }
+  return answer;
+ }
+
+ private static JLabel passwordlabel = new JLabel("使用者密碼");
+ private static JLabel success = new JLabel();
+ protected static JLabel fail = new JLabel("登入失敗 ! 剩餘一次機會");
+ private static JLabel nothing = new JLabel();
+ private static JLabel noright = new JLabel();
+ private static JLabel label = new JLabel("使用者帳號");
+ private static JButton forget = new JButton("忘記密碼");
+ private static JTextField usertext = new JTextField(20);
+ private static JPasswordField passwordtext = new JPasswordField(20);
+ private static JButton login = new JButton("登入");
+ private static JFrame frame = new JFrame("登入介面");
+ private static JPanel panel = new JPanel();
+ private static JButton turnback = new JButton("返回");
+ public static int check = 0;
+
+ private static JPanel bump = new JPanel();
+
+ teacher_login() {
+
+  frame.setSize(500, 300);
+  frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  frame.setVisible(true);
+  frame.setLayout(null);
+
+  frame.add(panel);
+  panel.setLayout(null);
+
+  frame.add(bump);
+  bump.setLayout(null);
+  label.setBounds(65, 20, 80, 25);
+  frame.add(label);
+
+  usertext.setBounds(140, 20, 150, 25);
+  frame.add(usertext);
+
+  passwordlabel.setBounds(65, 70, 80, 25);
+  frame.add(passwordlabel);
+
+  forget.setBounds(300, 70, 100, 25);
+  frame.add(forget);
+
+  passwordtext.setBounds(140, 70, 150, 25);
+  frame.add(passwordtext);
+
+  login.setBounds(173, 110, 70, 25);
+  frame.add(login);
+
+  success.setBounds(220, 160, 220, 25);
+  frame.add(success);
+
+  nothing.setBounds(180, 330, 220, 25);
+  frame.add(nothing);
+  nothing.setVisible(true);
+
+  noright.setBounds(155, 300, 150, 25);
+  frame.add(noright);
+  noright.setVisible(true);
+
+  turnback.setBounds(173, 150, 70, 25);
+  frame.add(turnback);
+  turnback.setVisible(true);
+
+  fail.setBounds(140, 285, 170, 25);
+  frame.add(fail);
+  fail.setVisible(false);
+
+  login.addActionListener(this);
+
+  turnback.addActionListener(this);
+  forget.addActionListener(this);
+
+  passwordtext.setEchoChar('*');
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  String username = usertext.getText();
+  String userpassword = passwordtext.getText();
+  System.out.println(username);
+  System.out.println(userpassword);
+  teacher_login login = new teacher_login();
+  String type = login.check(username, userpassword);
+
+  if (type.equals("true")) {
+   frame.dispose();
+   teacher_gui sys = new teacher_gui();
+
+  } else if (e.getSource() == turnback) {// 返回按鈕
+   frame.dispose();
+   charactergui cha = new charactergui();
+  } else if (e.getSource() == forget) {// 忘記密碼按鈕
+   frame.dispose();
+   teacher_forgetPassword tf = new teacher_forgetPassword();
+  }
+
+ }
+
+}
