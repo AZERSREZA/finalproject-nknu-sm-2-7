@@ -1,0 +1,63 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+public class student_gui implements ActionListener {
+ private static JButton search = new JButton("歷次成績查詢");
+ private static JButton change = new JButton("修改個人資料");
+ private static JButton test = new JButton("馬上考試");
+ private static JButton exer = new JButton("暖身練題");
+ private static JFrame userframe = new JFrame("學生資訊介面 ");
+ private static JButton back = new JButton("登出");
+ protected static boolean res = false;
+
+ student_gui() {
+  userframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  userframe.setSize(400, 400);
+  userframe.setLayout(null);
+  userframe.setVisible(true);
+
+  search.setBounds(115, 50, 150, 30);
+  change.setBounds(115, 105, 150, 30);
+  test.setBounds(115, 160, 150, 30);
+  exer.setBounds(115, 215, 150, 30);
+  back.setBounds(165, 300, 70, 25);
+
+  userframe.add(search);
+  userframe.add(change);
+  userframe.add(test);
+  userframe.add(exer);
+  userframe.add(back);
+
+  search.addActionListener(this);
+  change.addActionListener(this);
+  test.addActionListener(this);
+  exer.addActionListener(this);
+  back.addActionListener(this);
+
+ }
+
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  if (e.getSource() == back) {// 返回初始畫面
+   userframe.dispose();
+   charactergui cg = new charactergui();
+  } else if (e.getSource() == test) {// 考試
+   userframe.dispose();
+   exam exam = new exam();
+  } else if (e.getSource() == exer) {// 練習
+   userframe.dispose();
+   exer ex = new exer();
+  } else if (e.getSource() == change) {// 修改資料
+   userframe.dispose();
+   revise_studentAccount ch = new revise_studentAccount();
+  } else if (e.getSource() == search) {// 查詢成績
+   userframe.dispose();
+   student_searchScore ss = new student_searchScore();
+
+  }
+ }
+}
