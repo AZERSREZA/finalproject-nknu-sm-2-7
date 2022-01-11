@@ -1,0 +1,210 @@
+package login;
+
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.Timer;
+
+public class quickkill implements ActionListener{
+	 JFrame fr = new JFrame("快問快答");
+	 JFrame bump = new JFrame();
+	 JLabel ques = new JLabel("");
+	 JLabel test1 = new JLabel("A選項:");
+	 JLabel test2 = new JLabel("B選項:");
+	 JLabel timer = new JLabel("剩餘時間");
+	 JButton  check     = new JButton("開始快問快答");
+	 JButton  start     = new JButton("送出");
+	 
+	 JTextField answer = new JTextField(20);
+	 int second=30,minute=0;//TIMER'S APPLICATION
+	 String ddsecond,ddminute;
+	 DecimalFormat dformat = new  DecimalFormat("00");
+	 Timer tim;String userans;
+	 List finalques= new ArrayList();
+	 List havesec= new ArrayList();
+	 List randomans= new ArrayList();
+	 List randomprint= new ArrayList();
+	 int numbers=0;
+	 int alls=0;
+	 int k=0; String s="";
+	 ImageIcon icon1=new ImageIcon("C:\\Users\\user\\OneDrive\\圖片\\s.jpg" );
+	 ImageIcon icon2=new ImageIcon("C:\\Users\\user\\OneDrive\\圖片\\WTF.jpeg" );
+	 JPanel panel =new JPanel();
+	 JPanel panel1 =new JPanel();
+	 JLabel label1=new JLabel(icon1);
+	 String [] sString = {"難","易","中","全","任意"};
+	 JComboBox  choose = new JComboBox(sString);
+	
+	 
+quickkill(){
+
+		label1.setBounds(0,0,650,700);
+		fr.getLayeredPane().add(label1,new Integer(Integer.MIN_VALUE));
+		icon1.setImage(icon1.getImage().getScaledInstance(1000,1000,500));
+		icon2.setImage(icon2.getImage().getScaledInstance(650,700,500));
+		JPanel panelTop=new JPanel();
+		panelTop=(JPanel)fr.getContentPane(); 
+		panelTop.setOpaque(false);
+		panel.setOpaque(false); 
+		panel1.setOpaque(false);
+		fr.add(panel);
+
+	test1.setFont(new java.awt.Font("Dialog", 1, 15));
+    test2.setFont(new java.awt.Font("Dialog", 1, 15));
+	timer.setFont(new java.awt.Font("Dialog", 1, 15));
+	ques.setFont(new java.awt.Font("Dialog", 1, 15));
+	
+	test1.setForeground(Color.orange);
+    test2.setForeground(Color.orange);
+	timer.setForeground(Color.orange);
+	ques.setForeground(Color.orange);
+	
+	fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	fr.setSize(650, 700);
+	fr.setLayout(null);
+	fr.setVisible(true);
+	
+	ques.setBounds(160, 120, 400, 25);
+	test1.setBounds(150,250,200,25);
+	test2.setBounds(150,350,200,25);
+	check.setBounds(400,550,140,25);
+	timer.setBounds(150, 550, 150, 25);
+	start.setBounds(320,490,60,25);
+	answer.setBounds(330, 400, 30, 25);
+	choose.setBounds(400, 400, 100, 25);
+	
+	fr.add(ques);
+	fr.add(test1);
+	fr.add(test2);
+	fr.add(check);
+	fr.add(timer);
+	fr.add(start);
+	fr.add(answer);
+	fr.add(choose);
+	
+	
+	check.addActionListener(this);
+	start.addActionListener(this);
+	choose.addActionListener(this);
+ simpleTimer();
+
+
+}	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		 String ans =answer.getText();
+		 String ch =(String)choose.getSelectedItem();
+		 if(ch.equals("難")) {k=ghad.hard;s="2";}
+		 if(ch.equals("易")) {k=ghad.easy;s="1";}
+		 if(ch.equals("中")) {k=ghad.mid;s="3";}
+		 if(ch.equals("全")) {k=ghad.all;s="4";}
+		 if(ch.equals("任意")) {k=ghad.what;s="5";}
+		 System.out.println(s);
+		 
+		 
+		 
+	if(e.getSource()==check) {tim.start();randomout();
+	ques.setText("題目:     "+(String)finalques.get(0));test1.setText("A選項:   "+(String)finalques.get(1));test2.setText("B選項:    "+(String)finalques.get(2));
+	check.setVisible(false);
+	}
+	if(e.getSource()==start) {
+		if(!ans.equals("A")&&!ans.equals("B")&&!ans.equals("C")&&!ans.equals("D")) {JOptionPane.showMessageDialog(bump, "別亂打");}
+		if(ans.equals("A")|ans.equals("B")|ans.equals("C")|ans.equals("D")) {randomans.add(finalques.get(3));randomprint.add(ans); answer.setText("");
+		finalques.clear(); randomout(); ques.setText("題目:    "+(String)finalques.get(0));test1.setText("A選項:   "+(String)finalques.get(1));test2.setText("B選項:    "+(String)finalques.get(2));
+		}
+	}
+	
+	}
+	
+	
+	 public void simpleTimer() {//計時器
+		 
+		 	tim = new Timer(1000,new ActionListener() {
+		 		@Override
+		 		public void actionPerformed(ActionEvent e) {
+		 			ddsecond =dformat.format(second);
+		 			ddminute =dformat.format(minute);
+		 			timer.setText("剩餘時間 "+ddminute+":"+" "+ddsecond);
+		 			second--;
+		 			if(second==-1) {
+		 				second=59;
+		 				minute--;
+		 				ddsecond =dformat.format(second);
+		     			ddminute =dformat.format(minute);
+		     			timer.setText(ddminute+":"+" "+ddsecond);
+		 			}
+		 			if(minute==0&& second==0) {
+		 				JOptionPane.showMessageDialog(bump, "時間到");
+		 				tim.stop();timer.setText("剩餘時間 "+"00:00");
+		 				System.out.println(randomprint);
+		 				System.out.println(randomans);
+		 				goal();
+		 				JOptionPane.showMessageDialog(bump, "作答題數:"+alls+"\n"+"正確題數:"+numbers);
+		 				JOptionPane.showMessageDialog(bump,"下次再挑戰吧");
+		 				fr.dispose();
+		 			    
+		 			}
+		 			
+		 		}
+		 	});
+		  }
+	 
+	public void randomout() {//隨機出題
+		 List ques= new ArrayList();
+		 List asec= new ArrayList();
+		 List bsec= new ArrayList();
+		 List anse = new ArrayList();
+		 
+		 
+	  
+			
+		 if(randomans.size()==k) {tim.stop();goal();label1.setIcon(icon2);
+		 System.out.println(randomprint);
+		 System.out.println(randomans);
+		 JOptionPane.showMessageDialog(bump, "太快了吧，題目不夠用了");
+		 JOptionPane.showMessageDialog(bump, "作答題數:"+alls+"\n"+"正確題數:"+numbers);
+			JOptionPane.showMessageDialog(bump,"下次再挑戰吧");
+			
+		 }
+	 for(int i=0;i<ghad.qaq;i++) {
+		 ques.add(ghad.data[i][0]);asec.add(ghad.data[i][1]);bsec.add(ghad.data[i][2]);anse.add(ghad.data[i][3]);
+	 }
+	z:for(int c=0;c<5000;c++) {
+	  int k = (int)(Math.random()*ques.size());
+	 
+	   if(!havesec.contains(ques.get(k))&& ghad.data[k][4].contains(s)) {
+		   havesec.add(ques.get(k));{finalques.add(ques.get(k));finalques.add(asec.get(k));finalques.add(bsec.get(k));finalques.add(anse.get(k));}
+		   System.out.println("ok");
+		   break z;}
+	
+	   
+	 }
+	   
+	   
+	
+	 
+	}
+	public void goal() {//分數
+		for(int c=0;c<randomans.size();c++)
+		{ String a= (String)randomans.get(c);String b= (String)randomprint.get(c);
+           if(a.equals(b)) {numbers+=1;alls+=1;}   if(!a.equals(b)) {alls+=1;}                                     }
+	
+		
+		
+	}	
+	
+		
+	}
+	
