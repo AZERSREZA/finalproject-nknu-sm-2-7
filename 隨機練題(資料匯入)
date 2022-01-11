@@ -1,0 +1,64 @@
+package login;
+
+
+
+import java.io.BufferedReader;
+
+import java.io.File;
+import java.io.FileReader;
+
+import java.io.IOException;
+import java.util.ArrayList;
+	public class ghad {
+	public static String data [][];
+	public static int qaq=0;
+	public static int hard=0;
+	public static int easy=0;
+	public static int mid=0;
+	public static int all=0;
+	public static int what =0;
+	public static ArrayList<String> nums =new ArrayList();
+	public static String users = assigngui.usertext.getText();
+	public  static void main(String args[]) throws IOException{
+		//帳號總灌入
+		  ArrayList a =new ArrayList();
+		  ArrayList b =new ArrayList();
+		  ArrayList c =new ArrayList();
+		  ArrayList d =new ArrayList();
+		  ArrayList e =new ArrayList();
+		  String str =null;
+		  File f = new File("C:/準.csv");
+		  FileReader fr = new FileReader(f);
+		  BufferedReader br = new  BufferedReader(fr);
+		  while((str =br.readLine())!=null) { 
+			  String temp[] =str.split(",");
+			  a.add(temp[0]);	
+			  b.add(temp[1]);
+			  c.add(temp[2]);
+			  d.add(temp[3]);
+			  e.add(temp[4]);
+	     	  qaq+=1;
+			  }
+		data =new String[a.size()][5];
+		   for(int i=0; i<a.size();i++) {
+			   data[i][0]=(String)a.get(i);
+			   data[i][1]=(String)b.get(i);
+			   data[i][2]=(String)c.get(i);
+			   data[i][3]=(String)d.get(i);
+			   data[i][4]=(String)e.get(i);
+			   nums.add((String)e.get(i));
+		   }
+		   System.out.println(data[0][4]);
+		  
+		   for(int j=0;j<nums.size();j++) {if(nums.get(j).contains("1")) {easy+=1;all+=1;}
+		   if(nums.get(j).contains("2")) {hard+=1;all+=1;}
+		   if(nums.get(j).contains("3")) {mid+=1;all+=1;}
+		  if(nums.get(j).contains("5")) {what+=1;}}
+      System.out.println(data[0][0]);
+      System.out.println(data[1][4]);
+      System.out.println(easy);
+      System.out.println(hard);              
+      System.out.println(mid); 
+      System.out.println(all); 
+     quickkill ts =new quickkill();
+	}}
